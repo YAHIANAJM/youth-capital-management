@@ -6,7 +6,7 @@ const LINE_1 = "YOUTH CAPITAL";
 const LINE_2 = "MANAGEMENT";
 const LETTER_MS = 65;
 const LETTER_ANIM_MS = 400; // matches .intro-loader-letter's own animation-duration
-const HOLD_MS = 2400; // pause after the bar finishes filling, before fading into the app
+const HOLD_MS = 500; // pause after the bar finishes filling, before fading into the app
 
 // Last letter's delay + its own reveal time = when typing finishes — the
 // bar's fill duration is set to match this exactly, so it reaches 100% right
