@@ -1009,23 +1009,16 @@ html[dir="ltr"] .step::before {
 
 /* ═══ auth / forms ═══ */
 
-/* Outer page — the grey canvas peeking through the 10px inset around the
-   split card, same grey as .platform-shell. */
 .auth-wrap {
   min-height: 100vh;
-  padding: 10px;
-  background: hsl(220 14% 91%);
 }
 
 /* Fixed 50/50 split — image panel + white form panel, both full height,
-   clipped to one rounded card via overflow:hidden (not flush to the
-   viewport edges, not a floating card over a full-bleed photo). */
+   flush edge to edge (not a floating card over a full-bleed photo). */
 .auth-panels {
-  height: calc(100vh - 20px);
+  min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-radius: 1.5rem;
-  overflow: hidden;
 }
 
 .auth-visual {
@@ -1311,8 +1304,8 @@ html[dir="ltr"] .step::before {
 }
 
 .intro-loader-pen {
-  height: 80px;
-  width: auto;
+  width: 132px; /* same long-axis size as when it was rotated */
+  height: auto;
   opacity: 0;
   animation: intro-loader-logo-in 0.7s var(--ease-smooth) 0.9s both; /* starts once most of the text has revealed */
 }
