@@ -1009,21 +1009,108 @@ html[dir="ltr"] .step::before {
 
 /* ═══ auth / forms ═══ */
 
+/* Outer page — the grey canvas peeking through the 10px inset around the
+   split card, same grey as .platform-shell. */
 .auth-wrap {
-  min-height: calc(100vh - 140px);
+  min-height: 100vh;
+  padding: 10px;
+  background: hsl(220 14% 91%);
+}
+
+/* Fixed 50/50 split — image panel + white form panel, both full height,
+   clipped to one rounded card via overflow:hidden (not flush to the
+   viewport edges, not a floating card over a full-bleed photo). */
+.auth-panels {
+  height: calc(100vh - 20px);
   display: grid;
-  place-items: center;
-  padding: 3rem 1.5rem;
-  background: var(--gradient-hero);
+  grid-template-columns: 1fr 1fr;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.auth-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem 2.4rem;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+/* A little of the app's own navy over the photo — for contrast, and so
+   this page still reads as part of the same platform. */
+.auth-visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, hsl(222 46% 15% / 0.35), hsl(222 46% 15% / 0.82));
+}
+
+.auth-visual-top,
+.auth-visual-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-visual-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-visual-logo {
+  height: 30px;
+  width: auto;
+  /* the source SVG is navy/gold for light backgrounds — flatten it to
+     white so it reads against the dark photo overlay here */
+  filter: brightness(0) invert(1);
+}
+
+.auth-visual-back {
+  color: hsl(0 0% 100% / 0.85);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-visual-back:hover {
+  color: #fff;
+}
+
+.auth-visual-copy h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+  max-width: 22em;
+}
+
+.auth-visual-copy p {
+  font-size: 0.95rem;
+  color: hsl(0 0% 100% / 0.75);
+  max-width: 32em;
+  margin: 0;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 410px;
-  padding: 2.4rem 2.1rem;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2.4rem 1.5rem;
   display: grid;
-  gap: 1rem;
+  align-content: center;
+  gap: 0.85rem;
+  background: #fff;
   animation: rise-in 0.5s var(--ease-smooth) both;
+}
+
+@media (max-width: 860px) {
+  .auth-panels {
+    grid-template-columns: 1fr;
+  }
+  .auth-visual {
+    display: none;
+  }
 }
 
 .auth-card h2 {
@@ -1033,19 +1120,124 @@ html[dir="ltr"] .step::before {
 .auth-card .hint {
   font-size: 0.85rem;
   color: var(--color-text-muted);
-  margin: 0;
+  margin: 0 0 0.3rem;
 }
 
-/* ═══ intro loader — matches the live site's plain app-entry spinner ═══ */
+.auth-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.auth-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.auth-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.auth-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.auth-checkbox input {
+  width: auto;
+}
+
+.auth-forgot {
+  color: hsl(222 46% 15%);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-forgot:hover {
+  text-decoration: underline;
+}
+
+.auth-card-submit {
+  background: hsl(222 46% 15%); /* same navy as .sidebar / .project-board */
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-control);
+  padding: 0.8em 1em;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-card-submit:hover {
+  filter: brightness(1.2);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0.2rem 0;
+}
+
+.auth-divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.auth-card-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 0.75em 1em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.auth-card-google:hover {
+  border-color: hsl(222 46% 15% / 0.4);
+  background: hsl(222 20% 97%);
+}
+
+.auth-card-signup {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0.2rem 0 0;
+}
+
+.auth-card-signup a {
+  color: hsl(222 46% 15%);
+  font-weight: 600;
+}
+
+/* ═══ intro loader — navy splash with logo + gold progress bar, matching
+   the live site's SplashScreen (layout.tsx there) ═══ */
 
 .intro-loader {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: var(--color-obsidian);
+  background: hsl(222 46% 15%); /* same navy as .sidebar / .project-board */
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
   opacity: 1;
   transition: opacity 0.4s var(--ease-smooth);
 }
@@ -1053,6 +1245,96 @@ html[dir="ltr"] .step::before {
 .intro-loader.fading {
   opacity: 0;
   pointer-events: none;
+}
+
+.intro-loader-logo {
+  height: 76px;
+  width: auto;
+  animation: intro-loader-logo-in 0.9s var(--ease-smooth) both;
+}
+
+@keyframes intro-loader-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7) translateY(24px);
+    filter: blur(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Logo, text, then the pen — all stacked in one column. */
+.intro-loader-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.intro-loader-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-signature); /* same script face as the pen nav's Home/About labels */
+  color: #fff;
+  line-height: 1.15;
+}
+
+.intro-loader-title-line {
+  font-size: 1.6rem;
+  white-space: nowrap;
+}
+
+.intro-loader-title-line-sub {
+  font-size: 1.05rem;
+  color: hsl(43 80% 72%); /* --color-maghreb-gold-ish, ties it to the progress bar's gold */
+}
+
+.intro-loader-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: intro-loader-letter-in 0.4s var(--ease-smooth) both;
+}
+
+@keyframes intro-loader-letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro-loader-pen {
+  height: 80px;
+  width: auto;
+  opacity: 0;
+  animation: intro-loader-logo-in 0.7s var(--ease-smooth) 0.9s both; /* starts once most of the text has revealed */
+}
+
+.intro-loader-bar {
+  width: 280px;
+  height: 5px;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.1);
+  overflow: hidden;
+}
+
+.intro-loader-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-maghreb-gold), hsl(43 80% 72%));
+  animation: intro-loader-bar-fill 1.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes intro-loader-bar-fill {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 
 /* ═══ footer ═══ */
@@ -1768,28 +2050,6 @@ a.pen-nav-item.active {
   background: hsl(0 0% 0% / 0.4);
 }
 
-.project-board-list {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(0 0% 100% / 0.25) transparent;
-}
-
-.project-board-list::-webkit-scrollbar {
-  width: 5px;
-}
-
-.project-board-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.project-board-list::-webkit-scrollbar-thumb {
-  background: hsl(0 0% 100% / 0.25);
-  border-radius: 999px;
-}
-
-.project-board-list::-webkit-scrollbar-thumb:hover {
-  background: hsl(0 0% 100% / 0.4);
-}
-
 /* ═══ overview — global stats row (guest + logged-in) ═══ */
 
 .stats-grid {
@@ -2345,49 +2605,115 @@ a.pen-nav-item.active {
 .project-board {
   background: hsl(222 46% 15%);
   border-radius: 1.75rem; /* pronounced curve, same scale as .platform-content's 28px */
-  padding: 0.9rem;
+  padding: 1rem;
   margin-top: 1rem;
 }
 
-.project-board-tabs-dock {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end; /* notches sit flush with the tabs pill's bottom edge */
-}
-
+/* The tabs pill sits in a rectangle the same white as .platform-content,
+   the main card beside the sidebar. */
 .project-board-tabs {
   position: relative;
-  z-index: 1; /* under the notches, so they can overlap its corners */
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 1.4rem;
+  width: fit-content;
+  margin: -1rem auto 0; /* cancel .project-board's top padding so it sits flush at the top edge, no navy showing above */
+  padding: 5px 20px;
   background: #fff;
-  border-radius: var(--radius-control);
-  padding: 0.3rem;
+  border-radius: 0;
 }
 
-/* The concave curve flanking the white tabs pill where it meets the navy
-   box — same "tab" notch trick as browser tab shapes: a small square,
-   overlapping the pill's bottom corner, with a quarter-circle radial-
-   gradient cut out of the corner facing the pill (revealing its white
-   underneath) while the rest of the square paints over that corner in the
-   navy card color — the two curves together read as one smooth S-bend. */
-.project-board-notch {
-  position: relative;
-  z-index: 2;
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
+/* S-curve connector at the pill's two bottom corners — same 3-box technique
+   as the pen tab's connect point (.platform-content::before + .debug-square
+   /-2/-3): a white "bulge" box continues the pill outward with its far
+   corner rounded (convex), then a navy "base" + navy "scoop" pair overlaps
+   its lower half with the near corner rounded (concave), carving the bulge
+   back into the navy. Together: pill edge → convex bulge → concave scoop →
+   flat navy, instead of a single quarter-circle bite. TEMP debug colors
+   (pink/yellow/orange) so each piece is visible — revert to real colors
+   once placement is confirmed. */
+.project-board-tab-curve-left,
+.project-board-tab-curve-right {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
 }
 
-.project-board-notch-left {
-  margin-right: -16px;
-  background: radial-gradient(circle at top right, transparent 16px, hsl(222 46% 15%) 16px);
+.project-board-tab-curve-left {
+  left: 0;
+  top: 0;
+  bottom: 0; /* spans the pill's full height, so children can anchor to its top or bottom independently */
+  height: auto;
 }
 
-.project-board-notch-right {
-  margin-left: -16px;
-  background: radial-gradient(circle at top left, transparent 16px, hsl(222 46% 15%) 16px);
+.project-board-tab-curve-right {
+  right: 0;
+}
+
+.project-board-tab-curve-bulge {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  background: hotpink;
+}
+
+.project-board-tab-curve-base {
+  position: absolute;
+  bottom: -10px;
+  width: 10px;
+  height: 10px;
+  background: yellow;
+}
+
+.project-board-tab-curve-scoop {
+  position: absolute;
+  bottom: -10px;
+  width: 10px;
+  height: 10px;
+  background: orange;
+}
+
+.project-board-tab-curve-left .project-board-tab-curve-bulge,
+.project-board-tab-curve-left .project-board-tab-curve-base,
+.project-board-tab-curve-left .project-board-tab-curve-scoop {
+  width: 28px;
+  height: 28px;
+}
+/* Bulge pushed up to top:0 — flush with the pill's (and the navy card's)
+   top edge, instead of bottom-anchored where it left a navy sliver above it.
+   Width bumped and height matched to the white toggle rectangle beside it
+   (100% of the wrapper, which spans the pill's full height). */
+.project-board-tab-curve-left .project-board-tab-curve-bulge {
+  bottom: auto;
+  top: 0;
+  width: 40px;
+  height: 100%;
+}
+.project-board-tab-curve-left .project-board-tab-curve-base,
+.project-board-tab-curve-left .project-board-tab-curve-scoop {
+  top: auto;
+  bottom: -28px;
+}
+.project-board-tab-curve-left .project-board-tab-curve-bulge {
+  right: 100%;
+}
+.project-board-tab-curve-left .project-board-tab-curve-base {
+  right: 100%;
+}
+.project-board-tab-curve-left .project-board-tab-curve-scoop {
+  right: calc(100% - 28px);
+}
+
+.project-board-tab-curve-right .project-board-tab-curve-bulge {
+  left: 100%;
+}
+.project-board-tab-curve-right .project-board-tab-curve-base {
+  left: 100%;
+}
+.project-board-tab-curve-right .project-board-tab-curve-scoop {
+  left: calc(100% - 10px);
 }
 
 .project-board-tab {
@@ -2418,7 +2744,7 @@ a.pen-nav-item.active {
   height: 1.4em;
   padding: 0 0.4em;
   border-radius: 999px;
-  background: hsl(222 20% 90%);
+  background: hsl(222 20% 82%);
   color: hsl(222 46% 15%);
   font-size: 0.7rem;
   font-weight: 700;
@@ -2429,360 +2755,11 @@ a.pen-nav-item.active {
   color: #fff;
 }
 
-/* Gated preview — a blurred stand-in for the real content (which needs
-   login/role access), with a frosted overlay explaining why. */
-.project-board-gate {
-  position: relative;
+/* Content below the tabs is cleared out for a rebuild against the
+   reference design — just an empty navy rectangle for now. */
+.project-board-placeholder {
   margin-top: 0.7rem;
-  border-radius: var(--radius-control);
-  overflow: hidden;
-}
-
-.project-board-gate-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: 1rem;
-  filter: blur(6px);
-}
-
-.project-board-gate-row {
-  height: 2.4rem;
-  border-radius: calc(var(--radius-control) - 0.3rem);
-  background: hsl(222 40% 22%);
-}
-
-.project-board-gate-row:nth-child(2) {
-  width: 80%;
-}
-
-.project-board-gate-row:nth-child(3) {
-  width: 60%;
-}
-
-.project-board-gate-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  background: hsl(222 46% 15% / 0.55);
-  backdrop-filter: blur(3px);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-/* Two-pane list + detail body, under the tabs — 1:1 clone of the reference
-   dashboard's row/detail shape (avatar + #code + due + status + amount on
-   the left; 3-column header, item cards, totals footer on the right). */
-.project-board-body {
-  display: flex;
-  gap: 0.7rem;
-  margin-top: 0.7rem;
-  align-items: flex-start;
-}
-
-.project-board-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  flex: 0 0 38%;
-  max-height: 340px;
-  overflow-y: auto;
-}
-
-.project-board-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-align: left;
-  background: hsl(222 40% 20%);
-  border: none;
-  border-radius: calc(var(--radius-control) - 0.2rem);
-  padding: 0.5rem 0.7rem;
-  cursor: pointer;
-}
-
-.project-board-row.active {
-  background: #6659ea;
-}
-
-.project-board-row-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: #fff;
-  background: var(--color-istiqlal-rose);
-}
-
-.project-board-row-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.project-board-row-code {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.project-board-row-due {
-  font-size: 0.66rem;
-  font-weight: 500;
-  color: hsl(220 15% 72%);
-  white-space: nowrap;
-}
-
-.project-board-row.active .project-board-row-due {
-  color: hsl(0 0% 100% / 0.75);
-}
-
-.project-board-row-status {
-  flex-shrink: 0;
-  font-size: 0.65rem;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 0.3em 0.65em;
-  white-space: nowrap;
-}
-
-.project-board-row-status-viewed {
-  color: hsl(0 0% 100% / 0.7);
-  background: hsl(0 0% 100% / 0.12);
-}
-
-.project-board-row-status-unsent {
-  color: hsl(222 46% 15%);
-  background: #fff;
-}
-
-.project-board-row-amount {
-  flex-shrink: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.project-board-detail {
-  flex: 1;
-  min-width: 0;
-  background: linear-gradient(135deg, hsl(249 65% 45%), hsl(249 65% 30%));
-  border-radius: calc(var(--radius-control) - 0.2rem);
-  padding: 1rem 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-.project-board-detail-label {
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: hsl(0 0% 100% / 0.6);
-}
-
-.project-board-detail-header-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8rem;
-}
-
-.project-board-detail-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  min-width: 0;
-}
-
-.project-board-detail-code {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.project-board-detail-company {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.project-board-detail-logo {
-  width: 20px;
-  height: 20px;
-  border-radius: 0.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: hsl(0 0% 100% / 0.18);
-  font-size: 0.65rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.project-board-detail-customer {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.project-board-detail-customer .project-board-row-avatar {
-  background: hsl(0 0% 100% / 0.2);
-}
-
-.project-board-detail-customer-name {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.project-board-detail-customer-role {
-  display: block;
-  font-size: 0.65rem;
-  font-weight: 500;
-  color: hsl(0 0% 100% / 0.65);
-}
-
-.project-board-detail-items {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.project-board-detail-item {
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  background: hsl(0 0% 100% / 0.1);
-  border-radius: calc(var(--radius-control) - 0.3rem);
-  padding: 0.6rem 0.7rem;
-}
-
-.project-board-detail-item-icon {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  color: hsl(0 0% 100% / 0.6);
-  transform: rotate(-45deg);
-}
-
-.project-board-detail-item-amount {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.project-board-detail-item-label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: hsl(0 0% 100% / 0.7);
-}
-
-.project-board-detail-item-add {
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  border: 1px dashed hsl(0 0% 100% / 0.35);
-  background: transparent;
-  color: hsl(0 0% 100% / 0.75);
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.project-board-detail-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  flex-wrap: wrap;
-}
-
-.project-board-detail-totals {
-  display: flex;
-  gap: 1.2rem;
-}
-
-.project-board-detail-total {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.project-board-detail-total-value {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.project-board-detail-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.project-board-detail-icon-btn {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: hsl(0 0% 100% / 0.12);
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.project-board-detail-icon-btn:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: transparent;
-  color: #fff;
-}
-
-.project-board-detail-payout {
-  background: #fff;
-  color: hsl(222 46% 15%);
-  border: none;
-  border-radius: 999px;
-  padding: 0.55em 1.2em;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.project-board-detail-payout:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: transparent;
-  color: hsl(222 46% 15%);
+  min-height: 320px;
 }
 
 /* One shared grid (not two independently-stacking columns) so every row
