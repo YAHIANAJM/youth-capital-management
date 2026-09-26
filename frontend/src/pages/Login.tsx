@@ -58,8 +58,6 @@ export function Login() {
           <p className="hint">{tr.login.sent}</p>
         ) : (
           <>
-            <p className="hint">{isMockMode ? tr.login.hintMock : tr.login.hintReal}</p>
-
             <label className="auth-field">
               <span className="auth-field-label">{tr.login.email}</span>
               <input

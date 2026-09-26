@@ -1091,7 +1091,7 @@ html[dir="ltr"] .step::before {
   top: 10px;
   right: 10px;
   bottom: 10px;
-  width: 420px;
+  width: 690px;
   max-width: calc(100% - 20px); /* still fits with 10px on both sides on narrow screens, before the mobile stack below takes over */
   padding: 2.4rem 1.5rem;
   display: grid;
@@ -1118,7 +1118,14 @@ html[dir="ltr"] .step::before {
 }
 
 .auth-card h2 {
-  margin-bottom: 0.1rem;
+  position: absolute;
+  top: 10px;
+  left: 25px;
+  margin: 0;
+  padding-bottom: 4px;
+  padding-right: 0.6em; /* stretches the gold line a little past the word itself */
+  font-size: 2.5rem;
+  border-bottom: 2px solid #caa849; /* same gold used elsewhere (e.g. .project-board-side-title-text) */
 }
 
 .auth-card .hint {
