@@ -5,6 +5,8 @@ import {
   BellIcon,
   BoardIcon,
   BuildingIcon,
+  ChevronDownIcon,
+  CoinsIcon,
   GridIcon,
   InboxIcon,
   LogOutIcon,
@@ -23,6 +25,17 @@ import youthCapitalFull from "../../assets/images/youth-capital-full.svg";
 // the rail is hovered/expanded.
 const ITEMS = [
   { key: "overview", to: "/", Icon: GridIcon },
+  {
+    key: "finance",
+    to: null,
+    Icon: CoinsIcon,
+    children: [
+      { key: "financeIncome" },
+      { key: "financeExpenses" },
+      { key: "financeDocuments" },
+      { key: "financeReports" },
+    ],
+  },
   { key: "board", to: null, Icon: BoardIcon },
   { key: "newIdea", to: null, Icon: PlusCircleIcon },
   { key: "myRequests", to: null, Icon: InboxIcon },
@@ -46,6 +59,9 @@ export function Sidebar() {
   // treatment as a real route match, shared across both boxes (one
   // selection at a time for the whole rail).
   const [selectedStub, setSelectedStub] = useState<string | null>(null);
+  // Only one nested group exists today (Finance) — a single flag is enough;
+  // this'd need to become a Set/key if a second grouped item shows up.
+  const [financeOpen, setFinanceOpen] = useState(false);
 
   return (
     <>
@@ -64,8 +80,53 @@ export function Sidebar() {
           </Link>
 
           <nav className="sidebar-nav">
-            {ITEMS.map(({ key, to, Icon }) => {
+            {ITEMS.map((item) => {
+              const { key, to, Icon } = item;
               const label = tr.sidebar.nav[key];
+              const children = "children" in item ? item.children : null;
+
+              if (children) {
+                return (
+                  <div key={key} className="sidebar-group">
+                    <div
+                      className={`sidebar-item${selectedStub === key ? " active" : ""}`}
+                      title={`${label} — ${tr.sidebar.soon}`}
+                      aria-label={label}
+                      aria-expanded={financeOpen}
+                      onClick={() => {
+                        setSelectedStub(key);
+                        setFinanceOpen((open) => !open);
+                      }}
+                    >
+                      <Icon size={19} />
+                      <span className="sidebar-item-label">{label}</span>
+                      <ChevronDownIcon size={14} className={`sidebar-group-chevron${financeOpen ? " open" : ""}`} />
+                    </div>
+                    {financeOpen && (
+                      <div className="sidebar-group-children">
+                        {children.map((child) => {
+                          const childLabel = tr.sidebar.nav[child.key];
+                          return (
+                            <div
+                              key={child.key}
+                              className={`sidebar-item sidebar-subitem${selectedStub === child.key ? " active" : ""}`}
+                              title={`${childLabel} — ${tr.sidebar.soon}`}
+                              aria-label={childLabel}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedStub(child.key);
+                              }}
+                            >
+                              <span className="sidebar-item-label">{childLabel}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               return to ? (
                 <Link
                   key={key}

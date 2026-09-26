@@ -9,6 +9,7 @@ import { PlatformShell } from "../components/layout/PlatformShell";
 import { Login } from "../pages/Login";
 // import { NewIdea } from "../pages/NewIdea";
 import { Overview } from "../pages/Overview";
+import { PageTemplate } from "../pages/PageTemplate";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,12 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    // Preview-only route for the shared inner-page shell (sidebar + empty
+    // main rectangle) — remove once pages actually adopt it.
+    path: "/template",
+    element: <PageTemplate />,
   },
   // Other routes (about, board, idea detail/new) are unwired for now —
   // their sidebar entries render as disabled "soon" items. Pages still

@@ -1013,16 +1013,17 @@ html[dir="ltr"] .step::before {
   min-height: 100vh;
 }
 
-/* Fixed 50/50 split — image panel + white form panel, both full height,
-   flush edge to edge (not a floating card over a full-bleed photo). */
+/* Full-bleed photo, with the white sign-in card floating on top of it as
+   its own rounded panel (10px in from top/right/bottom) instead of the
+   old fixed 50/50 split. */
 .auth-panels {
+  position: relative;
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
 }
 
 .auth-visual {
   position: relative;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1086,20 +1087,30 @@ html[dir="ltr"] .step::before {
 }
 
 .auth-card {
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  width: 420px;
+  max-width: calc(100% - 20px); /* still fits with 10px on both sides on narrow screens, before the mobile stack below takes over */
   padding: 2.4rem 1.5rem;
   display: grid;
   align-content: center;
   gap: 0.85rem;
+  overflow-y: auto;
   background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 60px hsl(222 46% 15% / 0.35);
   animation: rise-in 0.5s var(--ease-smooth) both;
 }
 
 @media (max-width: 860px) {
-  .auth-panels {
-    grid-template-columns: 1fr;
+  .auth-card {
+    position: static;
+    width: 100%;
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
   }
   .auth-visual {
     display: none;
@@ -1413,9 +1424,9 @@ html[dir="ltr"] .step::before {
    grid placement once it's position:fixed. */
 .sidebar-col {
   position: fixed;
-  top: 1rem;
-  inset-inline-start: 1rem; /* logical, not "left" — this app defaults to dir="rtl", where the rail sits on the right */
-  bottom: 1rem;
+  top: 10px;
+  inset-inline-start: 10px; /* logical, not "left" — this app defaults to dir="rtl", where the rail sits on the right */
+  bottom: 10px;
   width: 72px;
   z-index: 60; /* above .section-nav (52) / its gold divider (53) — otherwise they'd poke through the backdrop unblurred */
   display: flex;
@@ -1563,6 +1574,42 @@ html[dir="ltr"] .step::before {
   color: #fff; /* white icon on top of it */
 }
 
+/* Finance's nested group — the parent item gets a chevron, children stack
+   underneath it, indented, only really legible once the rail is hover-
+   expanded (same as every other item's label). */
+.sidebar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.3rem;
+}
+
+.sidebar-group-chevron {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-group-chevron.open {
+  transform: rotate(180deg);
+}
+
+.sidebar-group-children {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.sidebar-subitem {
+  width: calc(100% - 1.2rem);
+  padding-inline-start: 2.4rem; /* indented under the parent's icon */
+  height: 34px;
+  font-size: 0.78rem;
+}
+
 /* Full-page blur while the rail is expanded — everything except the rail
    itself reads as dimmed/out-of-focus and unclickable (pointer-events is
    only enabled while visible, so it doesn't eat clicks at rest). */
@@ -1581,6 +1628,30 @@ html[dir="ltr"] .step::before {
 .sidebar-backdrop.visible {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* ═══ page template — shared inner-page shell preview ═══ */
+/* Same grey canvas / white sidebar as .platform-shell, but a plain empty
+   main rectangle instead of .platform-content's topbar+pen+curve stack —
+   this is the layout every sidebar link / KPI drill-down page should sit
+   inside, minus the page-specific content. Column width = sidebar's own
+   10px offset + 72px rest width + 10px gap, so the gap reads as exactly
+   10px instead of whatever .platform-shell's 104px column happens to leave. */
+.page-template {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  height: 100vh;
+  overflow: hidden;
+  background: hsl(220 14% 91%); /* same grey as .platform-shell */
+}
+
+.page-template-main {
+  grid-column: 2;
+  margin-block: 10px;
+  margin-inline: 0 10px; /* 0 on the side touching the sidebar's column (gap already baked into the 92px column), 10px on the outer edge */
+  background: #fff;
+  border-radius: 26px; /* same corners as .sidebar */
+  min-width: 0;
 }
 
 .platform-main {
@@ -2505,6 +2576,19 @@ a.pen-nav-item.active {
   border-color: var(--color-border);
 }
 
+.project-filter-select.disabled {
+  cursor: not-allowed;
+  color: var(--color-text-muted);
+}
+
+.project-filter-select.disabled:hover {
+  color: var(--color-text-muted);
+}
+
+.project-filter-select-wrap:has(.project-filter-select.disabled) {
+  opacity: 0.5;
+}
+
 /* The custom listbox panel — rendered 3px below the control itself, its
    own separate rounded/shadowed box (not achievable with a native <select>
    popup, which browsers style outside of CSS's reach). */
@@ -2592,29 +2676,148 @@ a.pen-nav-item.active {
   color: var(--color-text-muted);
 }
 
+/* Outer wrapper carries the spacing from whatever sits above (search bar,
+   etc.) — the navy box and tabs stack directly on each other with no gap
+   of their own now. */
+.project-board-wrap {
+  margin-top: 1rem;
+}
+
 /* Rebuild of the reference dashboard's dark "Unpaid Invoices" list card —
    same navy as the rest of this app's dark surfaces (.sidebar, .pen-nav),
    not the reference's near-black. */
 .project-board {
+  position: relative;
   background: hsl(222 46% 15%);
   border-radius: 1.75rem; /* pronounced curve, same scale as .platform-content's 28px */
-  padding: 1rem;
-  margin-top: 1rem;
+  border-top-left-radius: 0; /* flat top — the white tabs box sits flush on top of it now */
+  border-top-right-radius: 0;
+  padding: 16px 1rem 1rem; /* top nudged down a bit more so the capsule list isn't flush against the box's edge */
+}
+
+/* Two 30%-wide rectangles sitting entirely above the navy box, bottom edge
+   flush against its top border (no gap, no overlap) — one anchored to the
+   left edge, one to the right. Height matches the white toggle box's
+   measured 40px, plus 2%. TEMP debug color so they're visible. */
+.project-board-side {
+  position: absolute;
+  top: 0;
+  width: 28%; /* narrowed a little from 30% — every calc(30% ...) below moved to calc(28% ...) to match */
+  height: 40.8px; /* 40px measured toggle height + 2% */
+  transform: translateY(-100%);
+  background: hsl(222 46% 15%); /* same navy as .project-board */
+  z-index: 1;
+  border-top-left-radius: 1.75rem; /* same radius as .project-board's own (bottom) corners */
+  border-top-right-radius: 1.75rem;
+}
+
+.project-board-side-left {
+  left: 0;
+  background: hsl(222 46% 15%); /* same navy as .project-board */
+  border-top-right-radius: 0;
+  box-sizing: border-box;
+  padding: 12px 0 3px 32px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.project-board-side-title-text {
+  display: inline-block;
+  padding-bottom: 3px;
+  padding-inline-end: 20rem; /* stretches the gold line past the text, still well short of the full rectangle */
+  border-bottom: 2px solid #caa849; /* same gold used for .stat-card-top-label */
+}
+
+.project-board-side-right {
+  right: 0;
+  background: hsl(222 46% 15%); /* same navy as .project-board */
+  border-top-left-radius: 0;
+}
+
+/* Small orange accent beside each green rectangle — same size as the pink
+   bulge beside the pill (40 x 40.8), same idea applied down here. */
+.project-board-side-accent {
+  position: absolute;
+  top: 0;
+  transform: translateY(calc(-100% + 0.5px)); /* pushed down 0.5px */
+  width: 40px;
+  height: 52px; /* a little taller than the previous 40.8px */
+  background: #fff;
+  z-index: 1;
+  border-top-right-radius: 1.75rem; /* same radius pink uses */
+  border-bottom-left-radius: 1.75rem;
+}
+
+.project-board-side-accent-left {
+  right: auto;
+  left: calc(28% - 0.5px + 0.5px); /* nudged 1.5px right from the 28% - 2px baseline, then another 0.5px right */
+  border-bottom-left-radius: 1rem; /* reduced from 1.75rem */
+  z-index: 6; /* above .project-board-tabs (z-index:3) and the pink/yellow pieces (5/4) */
+  background: #fff;
+  transform: translateY(-100%); /* nudged up 0.5px from the shared -100% + 0.5px baseline */
+}
+
+.project-board-side-accent-right {
+  right: calc(28% + 0.5px); /* right at the inner edge of the right green rectangle, nudged 0.5px left */
+  /* Opposite diagonal from the left one (top-right + bottom-left there) —
+     the flat corner now faces the green rectangle on its right instead of
+     the curve facing it. */
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 1.75rem;
+  border-bottom-right-radius: 1rem; /* reduced from 1.75rem, matching its left-side brother */
+  background: #fff;
+  transform: translateY(-100%); /* nudged up 0.5px from the shared -100% + 0.5px baseline */
+}
+
+/* Black box sitting directly behind each orange accent — same size and
+   position, lower z-index so orange stays the top layer over it. */
+.project-board-side-accent-black {
+  position: absolute;
+  top: 0;
+  transform: translateY(-100%);
+  width: 40px;
+  height: 40.8px;
+  background: hsl(222 46% 15%); /* same navy as .project-board */
+  z-index: 0; /* below .project-board-side-accent's z-index:1 */
+}
+
+/* Same two-corner diagonal as the white accent it sits behind (not just
+   one corner) — otherwise black's un-rounded corner could peek out from
+   under white asymmetrically depending on which way the mirror goes. */
+.project-board-side-accent-black-left {
+  left: calc(28% - 2px);
+  border-top-right-radius: 1.75rem;
+  border-bottom-left-radius: 0;
+}
+
+.project-board-side-accent-black-right {
+  left: auto;
+  right: 28%; /* back to the same position as .project-board-side-accent-right (not the pushed-down one) */
+  border-top-left-radius: 1.75rem;
+  border-bottom-right-radius: 0;
 }
 
 /* The tabs pill sits in a rectangle the same white as .platform-content,
-   the main card beside the sidebar. */
+   the main card beside the sidebar. Now a plain sibling stacked directly
+   on top of the navy box (outside it, not overlapping into its padding) —
+   zero margin between the two, so they sit border-to-border. */
 .project-board-tabs {
   position: relative;
+  z-index: 7; /* above all the little pink/yellow/orange/navy pieces (highest of those was 6) */
   display: flex;
   align-items: center;
+  justify-content: space-between; /* keeps the first/last tabs flush at the edges even though the box is now wider than its content */
   gap: 1.4rem;
-  width: fit-content;
-  margin: -1rem auto 0; /* cancel .project-board's top padding so it sits flush at the top edge, no navy showing above */
-  padding: 5px 20px;
-  background: #fff;
+  width: 620px; /* narrowed now that there are 4 tabs instead of 5 */
+  margin: 0 auto;
+  padding: 5px 0; /* no left/right padding — tab buttons start and end flush at the container's edges */
+  background: transparent;
   border-radius: 0;
 }
+
 
 /* S-curve connector at the pill's two bottom corners — same 3-box technique
    as the pen tab's connect point (.platform-content::before + .debug-square
@@ -2625,19 +2828,21 @@ a.pen-nav-item.active {
    flat navy, instead of a single quarter-circle bite. TEMP debug colors
    (pink/yellow/orange) so each piece is visible — revert to real colors
    once placement is confirmed. */
+/* Re-parented into .project-board (same as .project-board-side) instead of
+   the pill's wrapper — that's what makes their position land on the same
+   coordinate system as the green rectangles, guaranteeing coverage instead
+   of guessing pixel offsets against an unrelated box. */
 .project-board-tab-curve-left,
 .project-board-tab-curve-right {
   position: absolute;
-  bottom: 0;
-  width: 0;
-  height: 0;
+  top: 0;
+  width: 100%; /* spans .project-board's full width, so a child's left/right % is computed against the navy box, not a zero-size point */
+  height: 100%;
+  pointer-events: none; /* it's just a positioning frame now, not a clickable area */
 }
 
 .project-board-tab-curve-left {
   left: 0;
-  top: 0;
-  bottom: 0; /* spans the pill's full height, so children can anchor to its top or bottom independently */
-  height: auto;
 }
 
 .project-board-tab-curve-right {
@@ -2646,67 +2851,80 @@ a.pen-nav-item.active {
 
 .project-board-tab-curve-bulge {
   position: absolute;
-  bottom: 0;
   width: 10px;
   height: 10px;
-  background: hotpink;
+  background: hsl(222 46% 15%); /* same navy as .project-board */
 }
 
 .project-board-tab-curve-base {
   position: absolute;
-  bottom: -10px;
   width: 10px;
   height: 10px;
-  background: yellow;
+  background: #fff; /* same white as the accent boxes, not pink */
 }
 
 .project-board-tab-curve-scoop {
   position: absolute;
-  bottom: -10px;
   width: 10px;
   height: 10px;
   background: orange;
+  display: none; /* TEMP hidden — only the yellow base piece was wanted here */
 }
 
+/* Same top:0 + translateY(-100%) technique as .project-board-side — height
+   is untouched (40.8px, as it already was), only the positioning mechanism
+   changed, so both sit in the exact same vertical band as green. */
 .project-board-tab-curve-left .project-board-tab-curve-bulge,
-.project-board-tab-curve-left .project-board-tab-curve-base,
-.project-board-tab-curve-left .project-board-tab-curve-scoop {
-  width: 28px;
-  height: 28px;
-}
-/* Bulge pushed up to top:0 — flush with the pill's (and the navy card's)
-   top edge, instead of bottom-anchored where it left a navy sliver above it.
-   Width bumped and height matched to the white toggle rectangle beside it
-   (100% of the wrapper, which spans the pill's full height). */
-.project-board-tab-curve-left .project-board-tab-curve-bulge {
-  bottom: auto;
-  top: 0;
-  width: 40px;
-  height: 100%;
-}
-.project-board-tab-curve-left .project-board-tab-curve-base,
-.project-board-tab-curve-left .project-board-tab-curve-scoop {
-  top: auto;
-  bottom: -28px;
-}
-.project-board-tab-curve-left .project-board-tab-curve-bulge {
-  right: 100%;
-}
 .project-board-tab-curve-left .project-board-tab-curve-base {
-  right: 100%;
+  top: 0;
+  transform: translateY(-100%);
+  height: 40.8px;
+  width: 40px;
 }
+
+.project-board-tab-curve-left .project-board-tab-curve-bulge {
+  left: calc(28% - 40px); /* same position as yellow now, fully covering it — matches the top pink/yellow pair */
+  z-index: 5; /* above yellow */
+  border-top-right-radius: 1.75rem; /* same radius as .project-board's own corners */
+  background: hsl(222 46% 15%);
+}
+
+.project-board-tab-curve-left .project-board-tab-curve-base {
+  left: calc(28% - 40px); /* right edge lands exactly at 28% — green's own right border */
+  z-index: 4; /* below pink, still above the navy box */
+  background: #fff;
+  height: 46px; /* a little taller than 40.8px — bottom stays pinned (translateY(-100%)), grows from the top */
+}
+
 .project-board-tab-curve-left .project-board-tab-curve-scoop {
-  right: calc(100% - 28px);
+  left: calc(28% - 28px);
+}
+
+/* Same fix mirrored onto the right side — was missing the size/vertical-
+   position treatment left already had, so it rendered as tiny default
+   10x10 squares instead of matching. */
+.project-board-tab-curve-right .project-board-tab-curve-bulge,
+.project-board-tab-curve-right .project-board-tab-curve-base {
+  top: 0;
+  transform: translateY(-100%);
+  height: 40.8px;
+  width: 40px;
 }
 
 .project-board-tab-curve-right .project-board-tab-curve-bulge {
-  left: 100%;
+  right: calc(28% - 40px); /* mirrors left: same position as base, fully covering it */
+  z-index: 5;
+  border-top-left-radius: 1.75rem; /* mirrored corner — left instead of right */
+  background: hsl(222 46% 15%);
 }
 .project-board-tab-curve-right .project-board-tab-curve-base {
-  left: 100%;
+  right: calc(28% - 40px);
+  z-index: 4;
+  background: #fff;
+  height: 46px; /* matches the left one */
 }
 .project-board-tab-curve-right .project-board-tab-curve-scoop {
-  left: calc(100% - 10px);
+  right: calc(28% - 28px);
 }
 
 .project-board-tab {
@@ -2748,11 +2966,1090 @@ a.pen-nav-item.active {
   color: #fff;
 }
 
-/* Content below the tabs is cleared out for a rebuild against the
-   reference design — just an empty navy rectangle for now. */
-.project-board-placeholder {
-  margin-top: 0.7rem;
-  min-height: 320px;
+/* Sub-filter row — only rendered while the main filter's status is "In
+   Review", to narrow it to regional_review or national_review specifically. */
+.project-board-substatus-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 520px;
+  margin: 0.5rem auto 0;
+}
+
+.project-board-substatus {
+  padding: 0.35em 0.8em;
+  border-radius: calc(var(--radius-control) - 0.2rem);
+  background: transparent;
+  border: 1px solid hsl(222 20% 82%);
+  color: hsl(222 20% 40%);
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.project-board-substatus.active {
+  background: #6659ea;
+  border-color: #6659ea;
+  color: #fff;
+}
+
+.project-board-empty {
+  margin: auto;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: hsl(220 10% 65%);
+  font-size: 0.85rem;
+}
+
+/* Two-column content below the tabs — left is the "Projects" list (rebuild
+   of the reference's "Unpaid Invoices" list, retargeted at projects
+   instead of invoices), right is the detail panel (still a placeholder —
+   content TBD). */
+.project-board-columns {
+  display: grid;
+  grid-template-columns: 0.7fr 1fr; /* narrower left column now that Money/Time stack instead of sitting side by side */
+  gap: 0.8rem;
+  height: 420px; /* fixed so the list scrolls internally instead of pushing the page down as more mock projects get added */
+}
+
+.project-board-list {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.project-board-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-inline-end: 0.3rem; /* room for the scrollbar so it doesn't sit flush against the capsules */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(0 0% 100% / 0.25) transparent;
+}
+
+.project-board-list-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.project-board-list-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-board-list-body::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.25);
+  border-radius: 999px;
+}
+
+.project-board-list-body::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 100% / 0.4);
+}
+
+.project-capsule {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: hsl(222 40% 22%); /* a step lighter than .project-board's navy, so rows read as distinct cards */
+  border-radius: 1rem;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-smooth);
+}
+
+.project-capsule:hover {
+  background: hsl(222 40% 26%);
+}
+
+.project-capsule.selected {
+  background: hsl(222 40% 28%);
+  outline: 2px solid #6659ea; /* same purple as .project-board-detail, ties the selection to the panel it filled */
+  outline-offset: -2px;
+}
+
+.project-capsule-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.project-capsule-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.project-capsule-name {
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-capsule-type {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.12);
+  color: hsl(220 10% 80%);
+}
+
+.project-capsule-type-extern {
+  background: #6659ea; /* same purple accent used across this app */
+  color: #fff;
+}
+
+.project-capsule-status-pill {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: hsl(190 60% 20%); /* cyan-tinted — same family as .status-pill's review/submitted color elsewhere in the app */
+  color: hsl(190 70% 70%);
+}
+
+.project-capsule-scope-pill {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.1);
+  color: hsl(220 10% 80%);
+}
+
+.project-capsule-sponsors-pill {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: #caa849; /* gold — distinct from the purple "extern" type pill */
+  background: hsl(38 45% 25%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.project-capsule-row-bottom {
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.project-capsule-pill-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.project-capsule-members-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  cursor: pointer;
+  color: hsl(220 10% 80%);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: hsl(0 0% 100% / 0.08);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+}
+
+.project-capsule-pill-divider {
+  flex-shrink: 0;
+  margin-inline-start: 0.5rem;
+  width: 1px;
+  height: 0.9em;
+  background: hsl(0 0% 100% / 0.25);
+}
+
+.project-capsule-pill-arrow {
+  flex-shrink: 0;
+  margin-inline-start: 0.4rem;
+  color: #fff; /* strong, full white — signals the pill is clickable */
+  transform: rotate(-90deg); /* ChevronDownIcon, rotated to point right — same trick as .sidebar-group-chevron */
+}
+
+.project-capsule-divider {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 1px;
+  background: hsl(0 0% 100% / 0.15);
+}
+
+.project-capsule-progress-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.project-capsule-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.project-capsule-progress-label {
+  flex-shrink: 0;
+  color: hsl(220 10% 70%);
+  font-size: 0.7rem;
+}
+
+.project-capsule-bar {
+  flex: 1;
+  min-width: 30px;
+  height: 5px;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.12);
+  overflow: hidden;
+}
+
+.project-capsule-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #caa849; /* gold — money progress */
+}
+
+.project-capsule-bar-fill-time {
+  background: #6659ea; /* purple — time progress, distinct from money's gold */
+}
+
+.project-capsule-progress-value {
+  flex-shrink: 0;
+  color: hsl(220 10% 70%);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.project-board-detail {
+  display: flex;
+  background: #6659ea; /* same purple accent used across this app (e.g. .project-capsule-type-extern) */
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.project-board-detail-left {
+  flex: 0.8; /* narrower than the right half */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(0 0% 100% / 0.35) transparent;
+}
+
+.project-board-detail-left::-webkit-scrollbar {
+  width: 6px;
+}
+
+.project-board-detail-left::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-board-detail-left::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.35);
+  border-radius: 999px;
+}
+
+.project-board-detail-left::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 100% / 0.5);
+}
+
+/* Right half — project owner + the same Money/Time bars as each capsule,
+   split off from the left by a faint divider. */
+.project-board-detail-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-inline-start: 1px solid hsl(0 0% 100% / 0.18);
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(0 0% 100% / 0.35) transparent;
+}
+
+.project-board-detail-right::-webkit-scrollbar {
+  width: 6px;
+}
+
+.project-board-detail-right::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-board-detail-right::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.35);
+  border-radius: 999px;
+}
+
+.project-board-detail-right::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 100% / 0.5);
+}
+
+.project-detail-owner-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.project-detail-owner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  background: hsl(0 0% 100% / 0.1);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+}
+
+/* Same pills as each capsule's top row on the left (.project-capsule-type /
+   .project-capsule-status-pill), reused as-is — pushed to the far right of
+   the owner row. */
+.project-detail-owner-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.project-detail-owner-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.project-detail-owner-name {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.project-detail-progress-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Chart 1 — "global" chart: Money/Time/Tasks together, one shared axis,
+   toggleable legend. Navy is Time's color per the earlier request to use
+   the app's actual navy in these charts. */
+.project-global-chart {
+  margin-top: 0.8rem;
+  background: #fff; /* was a translucent white tint — now solid white, so everything below is recolored for contrast against it instead of the purple panel */
+  border-radius: 0.8rem;
+  padding: 0.8rem;
+}
+
+.project-global-chart-legend {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-global-chart-legend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: hsl(222 46% 15%); /* navy, same as .section-nav — was white, now on a white box */
+  background: hsl(222 20% 94%);
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.project-global-chart-legend-btn:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  background: hsl(222 20% 88%);
+  color: hsl(222 46% 15%);
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-global-chart-legend-btn.off {
+  opacity: 0.45;
+}
+
+.project-global-chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.project-global-chart-svg {
+  width: 100%;
+  height: 190px;
+  display: block;
+}
+
+.project-global-chart-gridline {
+  stroke: hsl(222 20% 88%); /* light grey — was white-tinted, now on a white box */
+  stroke-width: 1;
+}
+
+.project-global-chart-axis-label {
+  fill: hsl(222 20% 45%); /* muted navy-grey — was white-tinted, now on a white box */
+  font-size: 8px;
+  font-family: var(--font-body);
+}
+
+.project-global-chart-axis-label-x {
+  text-anchor: middle;
+}
+
+.project-global-chart-area-time {
+  fill: hsl(222 46% 15%); /* the app's actual navy, per the request to use it in these charts */
+  fill-opacity: 0.55;
+  stroke: none;
+}
+
+.project-global-chart-area-money {
+  fill: #caa849; /* gold — same as the Money line/bar */
+  fill-opacity: 0.25;
+  stroke: none;
+}
+
+.project-global-chart-area-tasks {
+  fill: #6659ea; /* purple — same as the Tasks line */
+  fill-opacity: 0.25;
+  stroke: none;
+}
+
+.project-global-chart-line-time {
+  fill: none;
+  stroke: hsl(222 46% 15%);
+  stroke-width: 2;
+}
+
+.project-global-chart-line-money {
+  fill: none;
+  stroke: #caa849; /* gold — same as the Money bar */
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.project-global-chart-line-tasks {
+  fill: none;
+  stroke: #6659ea; /* purple accent — was white, invisible on the new white box */
+  stroke-width: 2;
+  stroke-dasharray: 2 3;
+}
+
+.project-detail-divider {
+  width: 100%;
+  height: 1px;
+  flex-shrink: 0;
+  background: hsl(0 0% 100% / 0.4);
+  margin: 0.6rem 0;
+}
+
+/* One block per sponsor: name+avatar pill on the left, ALL of that
+   sponsor's own invoices (not split between "first one" and "the rest")
+   stacked to the right. */
+.project-detail-sponsor-invoice-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.project-detail-invoice-rows {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* .project-capsule-progress/-label/-value/-bar are reused here as-is, but
+   they were tuned for the navy capsule background — the muted grey text
+   barely reads on purple, and the time bar's fill is the exact same purple
+   as this panel's own background (invisible). Override just the colors for
+   this context. */
+.project-detail-progress-stack .project-capsule-progress-label,
+.project-detail-progress-stack .project-capsule-progress-value {
+  color: hsl(0 0% 100% / 0.8);
+}
+
+.project-detail-progress-stack .project-capsule-bar {
+  background: hsl(0 0% 100% / 0.22);
+}
+
+.project-detail-progress-stack .project-capsule-bar-fill-time {
+  background: #fff; /* was the same purple as this panel's own background — invisible */
+}
+
+.project-detail-empty {
+  margin: auto;
+  text-align: center;
+  color: hsl(0 0% 100% / 0.7);
+  font-size: 0.85rem;
+}
+
+.project-detail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.project-detail-total-pill {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.9);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: hsl(0 0% 100% / 0.12);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.project-detail-heading-group {
+  display: flex;
+  align-items: center;
+  gap: 2.9rem; /* good breathing room between "Sponsors:" and "Invoices:" */
+}
+
+.project-detail-heading {
+  display: inline-block;
+  align-self: flex-start; /* .project-board-detail-left is a flex column, which stretches children full-width by default — this keeps the underline hugging just the text */
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding-bottom: 3px;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px solid #caa849; /* same gold as .project-board-side-title-text */
+}
+
+.project-detail-member {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  border-radius: 0.6rem;
+}
+
+.project-detail-member:hover {
+  background: hsl(0 0% 100% / 0.06);
+}
+
+.project-detail-member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.project-detail-member-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.project-detail-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.project-detail-member-name {
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: hsl(0 0% 100% / 0.14);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.project-detail-member-role {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.9);
+  font-size: 0.74rem;
+  background: hsl(0 0% 100% / 0.1);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.project-detail-member-meta {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.6);
+  font-size: 0.72rem;
+}
+
+.project-detail-member-tasks-btn {
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: #caa849; /* gold — matches the app's other action-ish accents */
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+}
+
+.project-board-load-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.project-board-load-more {
+  align-self: center;
+  margin-top: 0;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  background: hsl(0 0% 100% / 0.1);
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+}
+
+.project-board-load-more:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  background: hsl(0 0% 100% / 0.18);
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-detail-load-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.project-detail-load-more {
+  align-self: center;
+  margin-top: 0;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: hsl(0 0% 100% / 0.14);
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 1.1rem;
+  cursor: pointer;
+}
+
+.project-detail-load-more:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  background: hsl(0 0% 100% / 0.24);
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-detail-member-tasks-btn:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  background: hsl(38 55% 45%);
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Task list — revealed under a member row when clicked. */
+.project-detail-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0 0.6rem 3.2rem; /* lines up with the member's name, past the avatar */
+}
+
+.project-detail-task {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: hsl(0 0% 100% / 0.08);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.project-detail-task-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.project-detail-task-title {
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.project-detail-task-description {
+  margin: 0;
+  color: hsl(0 0% 100% / 0.75);
+  font-size: 0.7rem;
+}
+
+.project-detail-task-meta {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.6);
+  font-size: 0.68rem;
+}
+
+.project-detail-task-status {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.15);
+  color: #fff;
+}
+
+.project-detail-task-status-done {
+  background: hsl(150 45% 30%);
+}
+
+.project-detail-task-status-late {
+  background: hsl(0 60% 35%);
+}
+
+.project-detail-task-delay {
+  color: hsl(0 70% 85%);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+/* Invoices — sponsors' own bottom section. */
+.project-detail-invoices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem; /* between different sponsors' groups */
+  margin-top: 0.8rem; /* the "Invoices:" heading that used to sit right above this (now merged into the Sponsors row) provided this gap */
+}
+
+.project-detail-invoice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* spreads amount/date/status/button across the box's full width instead of clumping left */
+  gap: 0.6rem; /* the minimum, if space-between has nothing left to distribute */
+  background: hsl(0 0% 100% / 0.08);
+  border-radius: 0.6rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.project-detail-invoice-amount {
+  flex-shrink: 0;
+  color: #caa849;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.project-detail-invoice-date {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.6);
+  font-size: 0.68rem;
+}
+
+.project-detail-invoice-status {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: hsl(0 0% 100% / 0.15);
+  color: #fff;
+}
+
+.project-detail-invoice-status-paid {
+  background: hsl(150 45% 30%);
+}
+
+.project-detail-invoice-status-overdue {
+  background: hsl(0 60% 35%);
+}
+
+.project-detail-invoice-open-btn {
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fff;
+  background: hsl(0 0% 100% / 0.18);
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.project-detail-invoice-open-btn:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  background: hsl(0 0% 100% / 0.3);
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-detail-invoice-back {
+  align-self: flex-start;
+  margin-top: 0.8rem; /* the "Invoices:" heading that used to sit right above this (now merged into the Sponsors row) provided this gap */
+  margin-bottom: 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: hsl(0 0% 100% / 0.8);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.project-detail-invoice-back:hover {
+  /* cancel the global button:hover rule's rose tint/lift/glow */
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-detail-invoice-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.project-detail-invoice-id-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.project-detail-invoice-id {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.project-detail-invoice-company {
+  flex-shrink: 0;
+  color: hsl(0 0% 100% / 0.75);
+  font-size: 0.72rem;
+}
+
+.project-detail-member-header-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+/* Tasks-per-day activity heatmap — GitHub contribution graph style, but
+   sky blue (app doesn't use green anywhere) instead of the reference's
+   green scale. */
+.project-detail-heatmap {
+  display: flex;
+  gap: 3px;
+  margin: 0.6rem 0;
+  overflow-x: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(0 0% 100% / 0.35) transparent;
+}
+
+.project-detail-heatmap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.project-detail-heatmap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-detail-heatmap::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.35);
+  border-radius: 999px;
+}
+
+.project-detail-heatmap::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 100% / 0.5);
+}
+
+.project-detail-heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.project-detail-heatmap-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+/* Hover tooltip — position:fixed at real screen coordinates (set inline,
+   from the hovered cell's getBoundingClientRect in JS), not a CSS-only
+   :hover child. The heatmap's own overflow-x:auto clips anything
+   position:absolute that pops outside its box, so this escapes that
+   entirely and renders as a true top layer above everything, positioned
+   just above the cell that triggered it. */
+.project-detail-heatmap-tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 8px));
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: #111;
+  color: #fff;
+  font-size: 0.64rem;
+  white-space: nowrap;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.4rem;
+  pointer-events: none;
+}
+
+.project-detail-heatmap-tooltip-line {
+  display: block;
+}
+
+.project-detail-heatmap-level-0 {
+  background: hsl(0 0% 100% / 0.15); /* "no activity" — translucent white reads as empty on the purple panel */
+}
+
+.project-detail-heatmap-level-1 {
+  background: hsl(199 90% 80%);
+}
+
+.project-detail-heatmap-level-2 {
+  background: hsl(199 85% 65%);
+}
+
+.project-detail-heatmap-level-3 {
+  background: hsl(199 85% 48%);
+}
+
+.project-detail-heatmap-level-4 {
+  background: hsl(199 90% 32%);
+}
+
+/* Key/legend row, same shape as the reference's 5-swatch scale — placed
+   below the grid here instead of above it. */
+.project-detail-heatmap-key {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.project-detail-heatmap-key-label {
+  color: hsl(0 0% 100% / 0.6);
+  font-size: 0.66rem;
+}
+
+.project-detail-progress-label-sm {
+  color: hsl(0 0% 100% / 0.6);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.project-detail-invoice-items {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.project-detail-invoice-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: hsl(0 0% 100% / 0.14); /* grey box, per the reference's line-item boxes */
+  border-radius: 0.6rem;
+  padding: 0.6rem 0.7rem;
+}
+
+.project-detail-invoice-item-label {
+  color: hsl(0 0% 100% / 0.8);
+  font-size: 0.7rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-detail-invoice-item-amount {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.project-detail-invoice-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding-top: 0.6rem;
+  border-top: 1px solid hsl(0 0% 100% / 0.2);
+}
+
+.project-detail-member-divider {
+  height: 1px;
+  background: hsl(0 0% 100% / 0.18);
 }
 
 /* One shared grid (not two independently-stacking columns) so every row

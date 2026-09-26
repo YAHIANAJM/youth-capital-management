@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon, SearchIcon } from "../icons";
 
 // Rebuild of the reference invoice filter bar (customers/status/date-range/
@@ -8,7 +8,12 @@ import { ChevronDownIcon, SearchIcon } from "../icons";
 // scope (global/department) and kind (intern/extern). Status options below
 // are a placeholder guess (draft/submitted/in review/approved/rejected) —
 // the exact lifecycle stages are still an open decision per that doc.
-const DEPARTMENT_OPTIONS = [
+//
+// These four are independent, flat filters (not nested in one another) —
+// each one narrows the same underlying project list with straight AND
+// logic, applied together in ProjectBoard. Order: scope, department, type,
+// status.
+export const DEPARTMENT_OPTIONS = [
   "Tech",
   "Media & Communication",
   "Political Training",
@@ -17,11 +22,27 @@ const DEPARTMENT_OPTIONS = [
   "Organization",
 ];
 
-const STATUS_OPTIONS = ["Draft", "Submitted", "In Review", "Approved", "Rejected"];
+export const STATUS_OPTIONS = ["Draft", "Submitted", "In Review", "Approved", "Rejected"];
 
-const SCOPE_OPTIONS = ["Global", "Department"];
+export const SCOPE_OPTIONS = ["Global", "Department"];
 
-const KIND_OPTIONS = ["Intern", "Extern"];
+export const KIND_OPTIONS = ["Intern", "Extern"];
+
+// Only meaningful once status === "In Review" — regional_review/national_review
+// are the two real statuses that bucket merges (see ProjectBoard's
+// matchesStatus). Not one of the four flat top-level filters; it only
+// becomes visible/usable as a sub-filter once "In Review" is picked.
+export const REVIEW_STAGE_OPTIONS = ["Regional review", "National review"];
+
+export interface ProjectFilters {
+  scope: string;
+  department: string;
+  type: string;
+  status: string;
+  reviewStage: string;
+}
+
+export const EMPTY_FILTERS: ProjectFilters = { scope: "", department: "", type: "", status: "", reviewStage: "" };
 
 // Custom listbox instead of a native <select> — a native dropdown's popup
 // can't be styled (no controlling its own box, the 3px gap below the
@@ -32,11 +53,13 @@ function FilterSelect({
   onChange,
   options,
   allLabel,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   options: string[];
   allLabel: string;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -59,8 +82,9 @@ function FilterSelect({
     <div className="project-filter-select-wrap" ref={wrapRef}>
       <button
         type="button"
-        className={`project-filter-select${value ? "" : " placeholder"}`}
-        onClick={() => setOpen((o) => !o)}
+        className={`project-filter-select${value ? "" : " placeholder"}${disabled ? " disabled" : ""}`}
+        onClick={() => !disabled && setOpen((o) => !o)}
+        disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -95,17 +119,16 @@ function FilterSelect({
   );
 }
 
-export function ProjectFilterBar() {
-  const [department, setDepartment] = useState("");
-  const [status, setStatus] = useState("");
-  const [scope, setScope] = useState("");
-  const [kind, setKind] = useState("");
+export function ProjectFilterBar({
+  filters,
+  onChange,
+}: {
+  filters: ProjectFilters;
+  onChange: (patch: Partial<ProjectFilters>) => void;
+}) {
   const [search, setSearch] = useState("");
 
-  const activeCount = useMemo(
-    () => [department, status, scope, kind].filter(Boolean).length,
-    [department, status, scope, kind]
-  );
+  const activeCount = [filters.scope, filters.department, filters.type, filters.status].filter(Boolean).length;
 
   return (
     <div className="project-filter-bar">
@@ -113,10 +136,31 @@ export function ProjectFilterBar() {
         <span>Active filters</span>
         <span className="project-filter-active-count">{activeCount}</span>
       </div>
-      <FilterSelect value={department} onChange={setDepartment} options={DEPARTMENT_OPTIONS} allLabel="All departments" />
-      <FilterSelect value={status} onChange={setStatus} options={STATUS_OPTIONS} allLabel="All statuses" />
-      <FilterSelect value={scope} onChange={setScope} options={SCOPE_OPTIONS} allLabel="All scopes" />
-      <FilterSelect value={kind} onChange={setKind} options={KIND_OPTIONS} allLabel="All types" />
+      <FilterSelect
+        value={filters.scope}
+        onChange={(v) => onChange({ scope: v })}
+        options={SCOPE_OPTIONS}
+        allLabel="All scopes"
+      />
+      <FilterSelect
+        value={filters.department}
+        onChange={(v) => onChange({ department: v })}
+        options={DEPARTMENT_OPTIONS}
+        allLabel="All departments"
+        disabled={filters.scope === "Global"}
+      />
+      <FilterSelect
+        value={filters.type}
+        onChange={(v) => onChange({ type: v })}
+        options={KIND_OPTIONS}
+        allLabel="All types"
+      />
+      <FilterSelect
+        value={filters.status}
+        onChange={(v) => onChange({ status: v })}
+        options={STATUS_OPTIONS}
+        allLabel="All statuses"
+      />
       <div className="project-filter-search">
         <input
           type="text"
