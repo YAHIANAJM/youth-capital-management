@@ -2043,9 +2043,9 @@ a.pen-nav-item.active {
   border: none;
   background: transparent;
   color: hsl(0 0% 100% / 0.6);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-family: var(--font-signature); /* same script face as the pen nav's labels */
+  font-size: 1rem; /* script faces read much smaller than sans at the same size — same adjustment as .pen-nav-label */
+  font-weight: 400; /* this Google Font only ships one weight — 600 forces a synthetic bold that looks off */
   padding: 0.6em 1em;
   border-radius: 999px;
   cursor: pointer;
@@ -2226,7 +2226,13 @@ a.pen-nav-item.active {
 .wireframe {
   position: relative;
   width: 100%;
-  height: 100%;
+  /* Topbar (the pen header) used to sit above .platform-content and reserve
+     the vertical room .section-nav's -70px offset pokes up into — now that
+     it's removed, that space no longer exists on its own, so it's added
+     here instead (margin-top + a matching height reduction, so the total
+     box still fills .platform-content exactly as before). */
+  height: calc(100% - 90px);
+  margin-top: 90px;
   box-sizing: border-box;
   padding: 1.2rem 1.6rem;
   display: flex;
