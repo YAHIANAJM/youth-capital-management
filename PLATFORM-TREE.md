@@ -36,52 +36,56 @@ shell preview). Pages on disk with zero route and zero sidebar entry: `Home.tsx`
 
 ## 2. Finance ▾ — full spec (your field list + the Excalidraw "💰 Money / Invoices" branch)
 
-### Income (الأموال الداخلة)
-- Amount
-- Date
-- Source (Sponsor / Donation / Grant / Membership…)
-- From (company or person name)
-- Payment Method (Bank, Cash…)
-- Reference Number
-- Receipt / Proof (PDF or image)
-- Notes
-
-### Expenses (الأموال الخارجة)
-- Amount
-- Date
-- Category (Event, Marketing, Transport, Equipment…)
-- Paid to
-- Payment Method
-- Invoice / Justification (Facture, Bon, Reçu)
-- Approved by
-- Notes
-
-### Documents
-Every financial operation is linked to a document: Invoice, Receipt, Bank Transfer Proof,
-or Contract — as a PDF or image. (Excalidraw calls this same idea "Factures & documents —
-archived against the project.")
-
-### Reports / Dashboard
-- Total Money Raised
-- Total Expenses
-- Current Balance
-- Monthly Income vs Expenses
-- Budget per Project
-- (Excalidraw adds: active projects count, grants count — post-login only, per the
-  visibility rule in §3 below)
-
-### Link with Projects (cross-cutting — not its own sidebar item, but the field spec's
-worked example)
 ```
-Project A
-├── Budget:    20,000 DH
-├── Spent:     12,300 DH
-├── Remaining:  7,700 DH
-└── All invoices / justificatifs for this project attached here
+Finance Module
+│
+├── 💰 Income (الأموال الداخلة)
+│   ├── Amount
+│   ├── Date
+│   ├── Source          (Sponsor / Donation / Grant / Membership...)
+│   ├── From             (company or person name)
+│   ├── Payment Method  (Bank, Cash...)
+│   ├── Reference Number
+│   ├── Receipt / Proof  (PDF or image)
+│   └── Notes
+│
+├── 💸 Expenses (الأموال الخارجة)
+│   ├── Amount
+│   ├── Date
+│   ├── Category         (Event, Marketing, Transport, Equipment...)
+│   ├── Paid to
+│   ├── Payment Method
+│   ├── Invoice / Justification  (Facture, Bon, Reçu...)
+│   ├── Approved by
+│   └── Notes
+│
+├── 📊 Dashboard
+│   ├── Total Money Raised
+│   ├── Total Expenses
+│   ├── Current Balance
+│   ├── Monthly Income vs Expenses
+│   └── Budget per Project
+│   (Excalidraw also adds: active projects count, grants count — post-login only,
+│    per the visibility rule in §9 below)
+│
+├── 📂 Documents  (every financial operation is linked to one)
+│   ├── Invoice
+│   ├── Receipt
+│   ├── Bank Transfer Proof
+│   ├── Contract
+│   └── PDF or Image
+│
+└── 🔗 Link with Projects
+    └── e.g. Project A
+        ├── Budget:     20,000 DH
+        ├── Spent:      12,300 DH
+        ├── Remaining:   7,700 DH
+        └── every invoice / justificatif for it attached here
 ```
+
 Excalidraw's "Budgets" (one per project or program) and "Bourses / grants" (source —
 INDH / communes / donors — date, method, reason, backed by an approval document) are the
-same concept, one level up.
+same "Link with Projects" concept, one level up.
 
 **What this buys once built** (your own framing, kept verbatim): for every dirham, always
 know — where it came from, why it was spent, who approved it, where the justificatif is,
