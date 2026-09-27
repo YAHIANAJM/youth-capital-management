@@ -1169,6 +1169,74 @@ html[dir="ltr"] .step::before {
   box-shadow: 0 12px 30px hsl(222 46% 15% / 0.35);
   overflow: hidden; /* clips ::after below to this box — the shading never reaches .auth-card */
   z-index: 0; /* behind .auth-card (no explicit z-index of its own, but painted later in the DOM) — reads as tucked under it, not stuck flush beside it */
+  transition: transform 0.4s var(--ease-smooth);
+}
+
+/* Hidden state: slide the whole box 280px right — its left edge then lands
+   exactly on .auth-card's own left edge (right:670px - 280px = right:390px,
+   so the box spans right:390px to right:390+310px=700px, i.e. entirely
+   under the card's right:700px..10px footprint). .auth-card paints after
+   this element in the DOM with no z-index of its own, so it already covers
+   this box whenever they overlap — sliding it under just reuses that. */
+.auth-teddy-box-collapsed {
+  transform: translateX(280px);
+}
+
+/* Close (×) — top-left corner of the box, in the character's own scarf red
+   so it reads as belonging to the illustration rather than the UI chrome. */
+.auth-teddy-close {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1; /* above the Rive canvas */
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #b3384c; /* approximate scarf red — adjust to match the .riv asset exactly if needed */
+  background: hsl(0 0% 100% / 0.85);
+  color: #b3384c;
+  cursor: pointer;
+}
+
+.auth-teddy-close:hover {
+  background: #fff;
+  border-color: #b3384c;
+  color: #b3384c;
+  transform: none;
+  box-shadow: none;
+}
+
+/* The "ticket stub" left behind once the box is hidden — same idea as the
+   box's own overlap-under-the-card look, just permanently in that tucked
+   position. Its right edge sits flush on .auth-card's left edge (right:700px,
+   same math as .auth-teddy-box-collapsed above), poking out only on the
+   open, photo side. Clicking it brings the full box back. */
+.auth-teddy-reopen {
+  position: absolute;
+  top: 130px;
+  right: 700px;
+  width: 40px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: #fff;
+  border: none;
+  border-radius: 1.25rem 0 0 1.25rem; /* rounded only on the side that's actually visible */
+  box-shadow: 0 12px 30px hsl(222 46% 15% / 0.35);
+  color: hsl(222 46% 15%);
+  cursor: pointer;
+  z-index: 0; /* same layering as .auth-teddy-box — stays tucked under .auth-card */
+}
+
+.auth-teddy-reopen:hover {
+  color: hsl(222 46% 15%);
+  border-color: transparent;
+  transform: none;
+  box-shadow: 0 12px 30px hsl(222 46% 15% / 0.45);
 }
 
 /* Shading for the "sticking out like a ticket, layered under the card"

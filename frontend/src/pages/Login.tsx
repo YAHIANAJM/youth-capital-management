@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alignment, Fit, Layout, useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useLang } from "../i18n/LanguageContext";
 import { isMockMode, supabase } from "../lib/supabaseClient";
+import { ChevronDownIcon, CloseIcon } from "../components/icons";
 import loginBg from "../assets/images/login-bg.jpg";
 import logoFull from "../assets/images/youth-capital-full.svg";
 import loginTeddy from "../assets/rive/login-teddy.riv";
@@ -15,7 +16,15 @@ import loginTeddy from "../assets/rive/login-teddy.riv";
 // watches; from its own separate box in the corner, live-tracking a cursor
 // hundreds of pixels away never read as looking at anything).
 // https://rive.app/community/files/2244-7248-animated-login-character/
-function LoginTeddy({ passwordFocused }: { passwordFocused: boolean }) {
+function LoginTeddy({
+  passwordFocused,
+  collapsed,
+  onClose,
+}: {
+  passwordFocused: boolean;
+  collapsed: boolean;
+  onClose: () => void;
+}) {
   const { rive, RiveComponent } = useRive({
     src: loginTeddy,
     stateMachines: "Login Machine",
@@ -44,7 +53,12 @@ function LoginTeddy({ passwordFocused }: { passwordFocused: boolean }) {
   }, [passwordFocused, isChecking, numLook]);
 
   return (
-    <div className="auth-teddy-box">
+    <div className={`auth-teddy-box${collapsed ? " auth-teddy-box-collapsed" : ""}`}>
+      {!collapsed && (
+        <button type="button" className="auth-teddy-close" onClick={onClose} aria-label="Hide character">
+          <CloseIcon size={14} />
+        </button>
+      )}
       <RiveComponent className="auth-teddy" aria-hidden="true" />
     </div>
   );
@@ -67,6 +81,7 @@ export function Login() {
   const [remember, setRemember] = useState(false);
   const [sent, setSent] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [teddyVisible, setTeddyVisible] = useState(true);
   const navigate = useNavigate();
   const { tr } = useLang();
 
@@ -98,7 +113,21 @@ export function Login() {
           </div>
         </div>
 
-        <LoginTeddy passwordFocused={passwordFocused} />
+        <LoginTeddy
+          passwordFocused={passwordFocused}
+          collapsed={!teddyVisible}
+          onClose={() => setTeddyVisible(false)}
+        />
+        {!teddyVisible && (
+          <button
+            type="button"
+            className="auth-teddy-reopen"
+            onClick={() => setTeddyVisible(true)}
+            aria-label="Show character"
+          >
+            <ChevronDownIcon size={16} style={{ transform: "rotate(90deg)" }} />
+          </button>
+        )}
 
         <form onSubmit={handleSubmit} className="auth-card">
         <h2>{tr.login.title}</h2>

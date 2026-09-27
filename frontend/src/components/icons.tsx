@@ -286,3 +286,10 @@ export const PinIcon = (p: P) => (
     <circle cx="12" cy="9.5" r="2.3" />
   </I>
 );
+
+/** A close/dismiss X. */
+export const CloseIcon = (p: P) => (
+  <I {...p}>
+    <path d="M18 6 6 18M6 6l12 12" />
+  </I>
+);
