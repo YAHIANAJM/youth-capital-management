@@ -2226,13 +2226,7 @@ a.pen-nav-item.active {
 .wireframe {
   position: relative;
   width: 100%;
-  /* Topbar (the pen header) used to sit above .platform-content and reserve
-     the vertical room .section-nav's -70px offset pokes up into — now that
-     it's removed, that space no longer exists on its own, so it's added
-     here instead (margin-top + a matching height reduction, so the total
-     box still fills .platform-content exactly as before). */
-  height: calc(100% - 90px);
-  margin-top: 90px;
+  height: 100%;
   box-sizing: border-box;
   padding: 1.2rem 1.6rem;
   display: flex;

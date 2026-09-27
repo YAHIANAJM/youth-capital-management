@@ -24,7 +24,6 @@ export function Topbar() {
 
         <nav className="pen-nav">
           {NAV.map(({ key, to, Icon }) => {
-            const label = tr.topbar.pen[key];
             // Overview and About sit right at the navy section's two edges —
             // their hover label would otherwise spill past it, so nudge the
             // whole pill left on hover to keep the expansion inside.
@@ -34,9 +33,9 @@ export function Topbar() {
                 key={key}
                 to={to}
                 className={`pen-nav-item${pathname === to ? " active" : ""}${edge ? " pen-nav-item-edge" : ""}`}
+                title={tr.topbar.pen[key]}
               >
                 <Icon size={18} strokeWidth={1.25} />
-                <span className="pen-nav-label">{label}</span>
               </Link>
             ) : (
               <div
@@ -46,17 +45,13 @@ export function Topbar() {
                 aria-disabled="true"
               >
                 <Icon size={18} strokeWidth={1.25} />
-                <span className="pen-nav-label">{label}</span>
               </div>
             );
           })}
         </nav>
 
-        <Link to="/login" className="pen-signin">
+        <Link to="/login" className="pen-signin" title={`${tr.topbar.signIn} / ${tr.topbar.register}`}>
           <LogInIcon size={18} strokeWidth={1.25} />
-          <span>
-            {tr.topbar.signIn} / {tr.topbar.register}
-          </span>
         </Link>
       </div>
     </header>
