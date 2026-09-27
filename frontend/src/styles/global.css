@@ -1164,7 +1164,15 @@ html[dir="ltr"] .step::before {
   right: 670px; /* overlaps 30px INTO the card (card is right:10px + width:690px, so its left edge is at right:700px) — that overlapped strip, shadow included, sits behind the card instead of showing at a seam */
   width: 310px;
   height: 230px;
-  background: #fff;
+  /* Sampled directly from both .riv files' own backdrop (identical in
+     both: rgb(214, 226, 234)) rather than white — the wave character's
+     canvas is scaled down to match the watching one's apparent size (see
+     .auth-teddy-wave below), which leaves a margin around it where this
+     box's own background shows through; matching that margin's color to
+     the artwork's own sky lets it blend in instead of showing as a white
+     border. Invisible on the watching character, whose canvas already
+     fills this box edge to edge. */
+  background: #d6e2ea;
   border-radius: 1.25rem;
   box-shadow: 0 12px 30px hsl(222 46% 15% / 0.35);
   overflow: hidden; /* clips ::after below to this box — the shading never reaches .auth-card */
