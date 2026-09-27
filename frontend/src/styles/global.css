@@ -1274,6 +1274,7 @@ html[dir="ltr"] .step::before {
    resting pose) so the two read as the same size. */
 .auth-teddy-wave {
   transform: scale(0.81);
+  transform-origin: center bottom; /* anchors the shrink to the bottom edge, so it stays flush with the box's own bottom instead of leaving an even margin all around */
 }
 
 .auth-field {
