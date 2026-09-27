@@ -7,43 +7,17 @@ code, not just the docs.
 
 Legend: ✅ built & wired · ⚠️ stub/placeholder only, no data behind it · ❌ not started at all
 
-## 1. Sidebar tree, fully expanded — Finance detail + Board↔Finance link merged in
+## 1. Sidebar UI tree (as coded today — `frontend/src/components/layout/Sidebar.tsx`)
 
 ```
 Sidebar
 ├── Overview                → "/"        ✅ live (stat cards, filters, project board — all mock data)
-│
 ├── Finance ▾ (dropdown)                 ⚠️ stub group, no route
-│   │
 │   ├── Income                           ⚠️ stub, no file
-│   │   └── fields (spec only, nothing built): Amount · Date · Source (Sponsor /
-│   │       Donation / Grant / Membership) · From · Payment Method (Bank, Cash) ·
-│   │       Reference Number · Receipt / Proof (PDF or image) · Notes
-│   │
 │   ├── Expenses                         ⚠️ stub, no file
-│   │   └── fields (spec only, nothing built): Amount · Date · Category (Event /
-│   │       Marketing / Transport / Equipment) · Paid to · Payment Method ·
-│   │       Invoice / Justification (Facture, Bon, Reçu) · Approved by · Notes
-│   │
 │   ├── Documents                        ⚠️ stub, no file
-│   │   └── types (spec only): Invoice · Receipt · Bank Transfer Proof · Contract ·
-│   │       PDF or Image — every Income/Expense entry links to one
-│   │
 │   └── Reports                          ⚠️ stub, no file
-│       └── = "Dashboard" in the field spec (same thing, different name):
-│           Total Money Raised · Total Expenses · Current Balance ·
-│           Monthly Income vs Expenses · Budget per Project
-│           (Excalidraw also adds: active projects count, grants count —
-│            post-login only, per the visibility rule in §8 below)
-│
 ├── Board                                ⚠️ stub — file exists (Board.tsx) but unrouted, v1-shaped
-│   └── 🔗 Link with Projects (Finance ↔ Board — not its own sidebar item, lives on
-│       each project's own detail page, pulling from Finance's entries):
-│       e.g. Project A — Budget 20,000 DH, Spent 12,300 DH, Remaining 7,700 DH,
-│       every invoice/justificatif for it attached here. (Excalidraw's "Budgets"
-│       — one per project/program — and "Bourses/grants" — source, date, method,
-│       reason, approval doc — are this same concept, one level up.)
-│
 ├── New Idea                             ⚠️ stub — file exists (NewIdea.tsx) but unrouted, v1-shaped
 ├── My Requests                          ❌ stub, no file at all
 ├── Directory                            ❌ stub, no file — only ever "proposed," never confirmed
@@ -58,11 +32,66 @@ Routes that exist but aren't in the sidebar at all: `/login` (✅ live), `/templ
 shell preview). Pages on disk with zero route and zero sidebar entry: `Home.tsx`, `About.tsx`
 (old marketing pair).
 
-**What Finance buys once built** (your own framing, kept verbatim): for every dirham, always
+---
+
+## 2. Finance ▾ — full spec (your field list + the Excalidraw "💰 Money / Invoices" branch)
+
+```
+Finance Module
+│
+├── 💰 Income (الأموال الداخلة)
+│   ├── Amount
+│   ├── Date
+│   ├── Source          (Sponsor / Donation / Grant / Membership...)
+│   ├── From             (company or person name)
+│   ├── Payment Method  (Bank, Cash...)
+│   ├── Reference Number
+│   ├── Receipt / Proof  (PDF or image)
+│   └── Notes
+│
+├── 💸 Expenses (الأموال الخارجة)
+│   ├── Amount
+│   ├── Date
+│   ├── Category         (Event, Marketing, Transport, Equipment...)
+│   ├── Paid to
+│   ├── Payment Method
+│   ├── Invoice / Justification  (Facture, Bon, Reçu...)
+│   ├── Approved by
+│   └── Notes
+│
+├── 📊 Dashboard
+│   ├── Total Money Raised
+│   ├── Total Expenses
+│   ├── Current Balance
+│   ├── Monthly Income vs Expenses
+│   └── Budget per Project
+│   (Excalidraw also adds: active projects count, grants count — post-login only,
+│    per the visibility rule in §9 below)
+│
+├── 📂 Documents  (every financial operation is linked to one)
+│   ├── Invoice
+│   ├── Receipt
+│   ├── Bank Transfer Proof
+│   ├── Contract
+│   └── PDF or Image
+│
+└── 🔗 Link with Projects
+    └── e.g. Project A
+        ├── Budget:     20,000 DH
+        ├── Spent:      12,300 DH
+        ├── Remaining:   7,700 DH
+        └── every invoice / justificatif for it attached here
+```
+
+Excalidraw's "Budgets" (one per project or program) and "Bourses / grants" (source —
+INDH / communes / donors — date, method, reason, backed by an approval document) are the
+same "Link with Projects" concept, one level up.
+
+**What this buys once built** (your own framing, kept verbatim): for every dirham, always
 know — where it came from, why it was spent, who approved it, where the justificatif is,
 and which project it's tied to.
 
-### Finance build status: 0%
+### Build status: 0%
 No DB table, no backend route, no page, no form, no document upload anywhere in the repo.
 The only "finance" that exists today is 4 dead sidebar links and two hardcoded numbers on
 Overview's stat cards (`2.4M MAD` / `1.1M MAD` in `GlobalStats.tsx`) plus a flat
@@ -71,7 +100,7 @@ progress bar — no transactions, no dates, no documents, no approval).
 
 ---
 
-## 2. Board → Projects (+ Events) — from `README-IDEA-V2.md` §1/§4 + Excalidraw
+## 3. Board → Projects (+ Events) — from `README-IDEA-V2.md` §1/§4 + Excalidraw
 
 ```
 📂 Projects (+ Events)
@@ -101,7 +130,7 @@ Events link.
 
 ---
 
-## 3. New Idea — v1 concept (`README-IDEA.md` §5), likely superseded
+## 4. New Idea — v1 concept (`README-IDEA.md` §5), likely superseded
 
 Idea fields: Name (internal), Title (public), Description, Founder(s) + co-founders, Open
 to collaboration? (yes/no), Department + jiha tag(s), Project PDF (**locked**), Contact
@@ -113,7 +142,7 @@ regional coordinator, national dept lead, and leadership — even without founde
 Stays locked even after approval (no auto-generated public case-study version, for now).
 
 ⚠️ **Open conflict, not yet reconciled:** `README-IDEA-V2.md` §0 explicitly pivots away
-from this jiha-based idea lifecycle toward the department/Project model in §2 above. This
+from this jiha-based idea lifecycle toward the department/Project model in §3 above. This
 sidebar item's whole concept may be obsolete — flagged here, not resolved (you said to
 hold off touching the sidebar for now).
 
@@ -123,7 +152,7 @@ model.
 
 ---
 
-## 4. My Requests — `PLATFORM-SECTIONS.md` §3 row 5
+## 5. My Requests — `PLATFORM-SECTIONS.md` §3 row 5
 
 Outgoing collab requests the viewer sent, plus incoming ones if they're a founder.
 
@@ -132,7 +161,7 @@ Only the button exists (`CollabRequestButton.tsx`) — no list view of any kind.
 
 ---
 
-## 5. Directory — `PLATFORM-SECTIONS.md` §3, "proposed, not confirmed"
+## 6. Directory — `PLATFORM-SECTIONS.md` §3, "proposed, not confirmed"
 
 Browse departments × jihat × members — answers the "nobody knows who owns what" problem
 from `README-IDEA.md` §1, but was never explicitly signed off as in-scope.
@@ -141,7 +170,7 @@ from `README-IDEA.md` §1, but was never explicitly signed off as in-scope.
 
 ---
 
-## 6. Notifications — `PLATFORM-SECTIONS.md` §3 row 9
+## 7. Notifications — `PLATFORM-SECTIONS.md` §3 row 9
 
 Collab request updates, stage changes.
 
@@ -149,14 +178,14 @@ Collab request updates, stage changes.
 
 ---
 
-## 7. Account / Settings / Logout — `PLATFORM-SECTIONS.md` §3 row 10
+## 8. Account / Settings / Logout — `PLATFORM-SECTIONS.md` §3 row 10
 
 Own info, department/jiha membership, language — conceptually backed by
 `AuthContext.tsx`, but no Settings page exists.
 
 ---
 
-## 8. Header / auth-state logic — Excalidraw board, matches `README-IDEA-V2.md` §6
+## 9. Header / auth-state logic — Excalidraw board, matches `README-IDEA-V2.md` §6
 
 - **Two states everywhere:** before-login and after-login. Protected sections hidden
   entirely pre-login.
@@ -176,7 +205,7 @@ Own info, department/jiha membership, language — conceptually backed by
 
 ---
 
-## 9. Roles — `README-IDEA.md` §3 (status unclear after the v2 pivot)
+## 10. Roles — `README-IDEA.md` §3 (status unclear after the v2 pivot)
 
 | Role | Scope |
 |---|---|
@@ -190,7 +219,7 @@ open question whether this 4-tier table still applies as-is.
 
 ---
 
-## 10. Explicitly deferred / out of scope (`README-IDEA-V2.md`, "Note on a pasted feature list")
+## 11. Explicitly deferred / out of scope (`README-IDEA-V2.md`, "Note on a pasted feature list")
 
 - **AI** — pillar 3, deferred on purpose.
 - Member management as its own domain (cards, subscriptions, attendance, committees) —
@@ -203,7 +232,7 @@ open question whether this 4-tier table still applies as-is.
 
 ---
 
-## 11. Found but unrelated — flagging, not included above
+## 12. Found but unrelated — flagging, not included above
 
 The same Excalidraw canvas also has a cluster of notes about a Python "node registry"
 refactor (`Base.py`, `Factory.py`, `Generic_node.py`, `Register.py`, an `@register_node`
