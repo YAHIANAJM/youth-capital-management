@@ -7,6 +7,7 @@ import { ChevronDownIcon, CloseIcon } from "../components/icons";
 import loginBg from "../assets/images/login-bg.jpg";
 import logoFull from "../assets/images/youth-capital-full.svg";
 import loginTeddy from "../assets/rive/login-teddy.riv";
+import loginTeddyWave from "../assets/rive/login-teddy-wave.riv";
 
 // Rive's public "Animated Login Character" (community file, CC BY — credit
 // JcToon): a teddy bear that covers its eyes when the password field is
@@ -16,15 +17,7 @@ import loginTeddy from "../assets/rive/login-teddy.riv";
 // watches; from its own separate box in the corner, live-tracking a cursor
 // hundreds of pixels away never read as looking at anything).
 // https://rive.app/community/files/2244-7248-animated-login-character/
-function LoginTeddy({
-  passwordFocused,
-  collapsed,
-  onClose,
-}: {
-  passwordFocused: boolean;
-  collapsed: boolean;
-  onClose: () => void;
-}) {
+function TeddyWatching({ passwordFocused }: { passwordFocused: boolean }) {
   const { rive, RiveComponent } = useRive({
     src: loginTeddy,
     stateMachines: "Login Machine",
@@ -52,6 +45,36 @@ function LoginTeddy({
     if (numLook) numLook.value = 80;
   }, [passwordFocused, isChecking, numLook]);
 
+  return <RiveComponent className="auth-teddy" aria-hidden="true" />;
+}
+
+// "Wave, Hear and Talk" by japarj (community remix of JcToon's character
+// above, same rig/colors) — used only for its "wave" animation, played
+// directly rather than through its own state machine, since we only need
+// the one gesture: greet the visitor while the form is still empty.
+// https://rive.app/community/files/5628-11215-wave-hear-and-talk/
+function TeddyWave() {
+  const { RiveComponent } = useRive({
+    src: loginTeddyWave,
+    animations: "wave",
+    autoplay: true,
+    layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
+  });
+
+  return <RiveComponent className="auth-teddy" aria-hidden="true" />;
+}
+
+function LoginTeddy({
+  passwordFocused,
+  greeting,
+  collapsed,
+  onClose,
+}: {
+  passwordFocused: boolean;
+  greeting: boolean;
+  collapsed: boolean;
+  onClose: () => void;
+}) {
   return (
     <div className={`auth-teddy-box${collapsed ? " auth-teddy-box-collapsed" : ""}`}>
       {!collapsed && (
@@ -59,7 +82,7 @@ function LoginTeddy({
           <CloseIcon size={14} />
         </button>
       )}
-      <RiveComponent className="auth-teddy" aria-hidden="true" />
+      {greeting ? <TeddyWave /> : <TeddyWatching passwordFocused={passwordFocused} />}
     </div>
   );
 }
@@ -84,6 +107,9 @@ export function Login() {
   const [teddyVisible, setTeddyVisible] = useState(true);
   const navigate = useNavigate();
   const { tr } = useLang();
+  // First entry to the page, and any time both fields are cleared back to
+  // empty, greet with a wave instead of the watching/eyes-cover behavior.
+  const isFormEmpty = email === "" && password === "";
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -115,6 +141,7 @@ export function Login() {
 
         <LoginTeddy
           passwordFocused={passwordFocused}
+          greeting={isFormEmpty}
           collapsed={!teddyVisible}
           onClose={() => setTeddyVisible(false)}
         />
