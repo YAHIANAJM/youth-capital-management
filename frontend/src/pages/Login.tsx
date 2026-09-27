@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Alignment, Fit, Layout, useRive, useStateMachineInput } from "@rive-app/react-canvas";
+import { Alignment, EventType, Fit, Layout, useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useLang } from "../i18n/LanguageContext";
 import { isMockMode, supabase } from "../lib/supabaseClient";
 import { ChevronDownIcon, CloseIcon } from "../components/icons";
@@ -51,30 +51,47 @@ function TeddyWatching({ passwordFocused }: { passwordFocused: boolean }) {
 // "Wave, Hear and Talk" by japarj (community remix of JcToon's character
 // above, same rig/colors) — used only for its "wave" animation, played
 // directly rather than through its own state machine, since we only need
-// the one gesture: greet the visitor while the form is still empty.
+// the one gesture: greet the visitor while the form is still empty. It's a
+// one-shot animation, not a loop — left alone it plays once and then just
+// holds its last frame forever, so `onFinish` (wired to Rive's own Stop
+// event, fired once the animation has fully played out) hands off to
+// TeddyWatching instead of freezing there.
 // https://rive.app/community/files/5628-11215-wave-hear-and-talk/
-function TeddyWave() {
-  const { RiveComponent } = useRive({
+function TeddyWave({ onFinish }: { onFinish: () => void }) {
+  const { rive, RiveComponent } = useRive({
     src: loginTeddyWave,
     animations: "wave",
     autoplay: true,
     layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
   });
 
+  useEffect(() => {
+    if (!rive) return;
+    rive.on(EventType.Stop, onFinish);
+    return () => rive.off(EventType.Stop, onFinish);
+  }, [rive, onFinish]);
+
   return <RiveComponent className="auth-teddy" aria-hidden="true" />;
 }
 
 function LoginTeddy({
   passwordFocused,
-  greeting,
+  emptyForm,
   collapsed,
   onClose,
 }: {
   passwordFocused: boolean;
-  greeting: boolean;
+  emptyForm: boolean;
   collapsed: boolean;
   onClose: () => void;
 }) {
+  // Mirrors emptyForm on every change (waves again each time the visitor
+  // clears back to empty, drops the wave immediately if they start typing
+  // mid-wave) — but TeddyWave's own onFinish can also flip this to false on
+  // its own once the animation ends, while emptyForm is still true.
+  const [waving, setWaving] = useState(emptyForm);
+  useEffect(() => setWaving(emptyForm), [emptyForm]);
+
   return (
     <div className={`auth-teddy-box${collapsed ? " auth-teddy-box-collapsed" : ""}`}>
       {!collapsed && (
@@ -82,7 +99,11 @@ function LoginTeddy({
           <CloseIcon size={14} />
         </button>
       )}
-      {greeting ? <TeddyWave /> : <TeddyWatching passwordFocused={passwordFocused} />}
+      {waving ? (
+        <TeddyWave onFinish={() => setWaving(false)} />
+      ) : (
+        <TeddyWatching passwordFocused={passwordFocused} />
+      )}
     </div>
   );
 }
@@ -141,7 +162,7 @@ export function Login() {
 
         <LoginTeddy
           passwordFocused={passwordFocused}
-          greeting={isFormEmpty}
+          emptyForm={isFormEmpty}
           collapsed={!teddyVisible}
           onClose={() => setTeddyVisible(false)}
         />
