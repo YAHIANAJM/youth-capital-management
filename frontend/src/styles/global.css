@@ -1885,35 +1885,6 @@ html[dir="ltr"] .step::before {
   pointer-events: none;
 }
 
-.pen-nav-item:hover,
-a.pen-nav-item.active {
-  border-bottom: 1px solid #caa849; /* thin gold underline under icon + text together, matches .pen-signin */
-}
-
-/* Overview and About sit at the navy section's edges — shift left while
-   the label is showing (hover or active) so it stays inside the navy
-   barrel instead of spilling onto the gold band / cap. */
-.pen-nav-item-edge:hover,
-.pen-nav-item-edge.active {
-  transform: translateX(-17px);
-}
-
-/* About sits a touch too close to the cap at rest, now that its label is
-   always visible — a small standing nudge left, on top of the bigger
-   hover/active shift above. */
-.pen-nav-item-about {
-  transform: translateX(-16px);
-}
-
-.pen-signin:hover {
-  color: #fff; /* stays white — no more white-fill/purple-text swap */
-  border-bottom: 1px solid #caa849; /* gold underline under icon + text together, same shape as the nav items */
-}
-
-a.pen-nav-item.active {
-  color: #fff; /* stays white — no more white-fill/purple-text swap */
-}
-
 .pen-nav-item.disabled {
   cursor: default;
 }
