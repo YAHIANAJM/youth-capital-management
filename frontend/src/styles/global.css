@@ -1104,21 +1104,6 @@ html[dir="ltr"] .step::before {
   animation: rise-in 0.5s var(--ease-smooth) both;
 }
 
-/* Shading right where the card overlaps the teddy's box (.auth-teddy-box:
-   top:50px, height:230px, tucked 30px under this card's left edge) — sells
-   the "sticking out like a ticket, layered under the card" look, instead of
-   a plain flat seam. Localized to that strip, not the card's full height. */
-.auth-card::before {
-  content: "";
-  position: absolute;
-  top: 30px; /* .auth-teddy-box's top:50px minus this card's own top:10px */
-  left: 0;
-  width: 36px;
-  height: 230px;
-  background: linear-gradient(to right, hsl(222 46% 15% / 0.22), transparent);
-  pointer-events: none;
-}
-
 @media (max-width: 860px) {
   .auth-card {
     position: static;
@@ -1182,8 +1167,23 @@ html[dir="ltr"] .step::before {
   background: #fff;
   border-radius: 1.25rem;
   box-shadow: 0 12px 30px hsl(222 46% 15% / 0.35);
-  overflow: hidden;
+  overflow: hidden; /* clips ::after below to this box — the shading never reaches .auth-card */
   z-index: 0; /* behind .auth-card (no explicit z-index of its own, but painted later in the DOM) — reads as tucked under it, not stuck flush beside it */
+}
+
+/* Shading for the "sticking out like a ticket, layered under the card"
+   look, moved fully inside the teddy's own box (was previously painted on
+   .auth-card instead, bleeding the shade onto the white sign-in panel).
+   Anchored to this box's own right edge and clipped by its overflow:hidden,
+   so it can never show up past this box's bounds. */
+.auth-teddy-box::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: 36px;
+  background: linear-gradient(to left, hsl(222 46% 15% / 0.22), transparent);
+  pointer-events: none;
 }
 
 .auth-teddy {
