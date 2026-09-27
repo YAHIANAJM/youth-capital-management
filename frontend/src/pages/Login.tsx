@@ -1,9 +1,54 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Alignment, Fit, Layout, useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useLang } from "../i18n/LanguageContext";
 import { isMockMode, supabase } from "../lib/supabaseClient";
 import loginBg from "../assets/images/login-bg.jpg";
 import logoFull from "../assets/images/youth-capital-full.svg";
+import loginTeddy from "../assets/rive/login-teddy.riv";
+
+// Rive's public "Animated Login Character" (community file, CC BY — credit
+// JcToon): a teddy bear that covers its eyes when the password field is
+// focused (isHandsUp), and otherwise holds a fixed glance toward the login
+// box (numLook set once, not cursor-tracked — that animation is only a
+// small glance, designed for a bear sitting directly above the field it
+// watches; from its own separate box in the corner, live-tracking a cursor
+// hundreds of pixels away never read as looking at anything).
+// https://rive.app/community/files/2244-7248-animated-login-character/
+function LoginTeddy({ passwordFocused }: { passwordFocused: boolean }) {
+  const { rive, RiveComponent } = useRive({
+    src: loginTeddy,
+    stateMachines: "Login Machine",
+    autoplay: true,
+    // default fit (Contain) was letterboxing — visible white gaps on the
+    // left/right since the box's aspect ratio doesn't match the artboard's.
+    // Cover fills the whole box on every side, cropping instead of gapping.
+    layout: new Layout({ fit: Fit.Cover, alignment: Alignment.Center }),
+  });
+  const isHandsUp = useStateMachineInput(rive, "Login Machine", "isHandsUp");
+  const numLook = useStateMachineInput(rive, "Login Machine", "numLook");
+  const isChecking = useStateMachineInput(rive, "Login Machine", "isChecking");
+
+  useEffect(() => {
+    if (isHandsUp) isHandsUp.value = passwordFocused;
+  }, [passwordFocused, isHandsUp]);
+
+  useEffect(() => {
+    // isChecking gates the whole "Look" branch — without it numLook does
+    // nothing. Held true whenever not covering the eyes for password.
+    if (isChecking) isChecking.value = !passwordFocused;
+    // 28 landed dead-center/straight-down — the true range is likely wider
+    // than 0-30 (that 30-cap was a guess made before isChecking was wired
+    // up, when nothing moved regardless of value). Pushing further out.
+    if (numLook) numLook.value = 80;
+  }, [passwordFocused, isChecking, numLook]);
+
+  return (
+    <div className="auth-teddy-box">
+      <RiveComponent className="auth-teddy" aria-hidden="true" />
+    </div>
+  );
+}
 
 function GoogleIcon() {
   return (
@@ -21,6 +66,7 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [sent, setSent] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const navigate = useNavigate();
   const { tr } = useLang();
 
@@ -52,8 +98,11 @@ export function Login() {
           </div>
         </div>
 
+        <LoginTeddy passwordFocused={passwordFocused} />
+
         <form onSubmit={handleSubmit} className="auth-card">
         <h2>{tr.login.title}</h2>
+        <p className="auth-welcome-back">Welcome Back</p>
         {sent ? (
           <p className="hint">{tr.login.sent}</p>
         ) : (
@@ -76,6 +125,8 @@ export function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
                 autoComplete="current-password"
               />
             </label>

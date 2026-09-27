@@ -1104,6 +1104,21 @@ html[dir="ltr"] .step::before {
   animation: rise-in 0.5s var(--ease-smooth) both;
 }
 
+/* Shading right where the card overlaps the teddy's box (.auth-teddy-box:
+   top:50px, height:230px, tucked 30px under this card's left edge) — sells
+   the "sticking out like a ticket, layered under the card" look, instead of
+   a plain flat seam. Localized to that strip, not the card's full height. */
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: 30px; /* .auth-teddy-box's top:50px minus this card's own top:10px */
+  left: 0;
+  width: 36px;
+  height: 230px;
+  background: linear-gradient(to right, hsl(222 46% 15% / 0.22), transparent);
+  pointer-events: none;
+}
+
 @media (max-width: 860px) {
   .auth-card {
     position: static;
@@ -1128,10 +1143,52 @@ html[dir="ltr"] .step::before {
   border-bottom: 2px solid #caa849; /* same gold used elsewhere (e.g. .project-board-side-title-text) */
 }
 
+/* "Welcome Back" — sits under the (absolutely-positioned, top-left) h2,
+   but centered across the full card width instead of left-aligned with it. */
+.auth-welcome-back {
+  position: absolute;
+  top: 90px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 2.3rem; /* just a little smaller than the 2.5rem "Sign in" heading, not tiny */
+  font-family: var(--font-signature); /* same script face as .pen-nav-label, the pen header's text style */
+  font-weight: 400; /* these Google Fonts only ship one weight — 700 forces a synthetic bold that looks off */
+  color: #caa849;
+  z-index: 2;
+}
+
 .auth-card .hint {
   font-size: 0.85rem;
   color: var(--color-text-muted);
   margin: 0 0 0.3rem;
+}
+
+/* Its own little box, outside .auth-card entirely (not a child of it — that
+   element clips overflow, which would've hidden anything poking past its
+   left edge). Positioned relative to .auth-panels instead, overlapping the
+   card's left edge by 20px so it reads as stuck onto the card like a ticket
+   stub, with most of the box sticking out past it. .auth-card is
+   right:10px + width:690px, so its left edge sits at right:700px from
+   .auth-panels' own right edge — this box's right edge sits 20px inside
+   that, at right:680px. */
+.auth-teddy-box {
+  position: absolute;
+  top: 50px;
+  right: 670px; /* overlaps 30px INTO the card (card is right:10px + width:690px, so its left edge is at right:700px) — that overlapped strip, shadow included, sits behind the card instead of showing at a seam */
+  width: 310px;
+  height: 230px;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 30px hsl(222 46% 15% / 0.35);
+  overflow: hidden;
+  z-index: 0; /* behind .auth-card (no explicit z-index of its own, but painted later in the DOM) — reads as tucked under it, not stuck flush beside it */
+}
+
+.auth-teddy {
+  width: 100%;
+  height: 100%;
 }
 
 .auth-field {
