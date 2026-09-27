@@ -71,7 +71,7 @@ function TeddyWave({ onFinish }: { onFinish: () => void }) {
     return () => rive.off(EventType.Stop, onFinish);
   }, [rive, onFinish]);
 
-  return <RiveComponent className="auth-teddy" aria-hidden="true" />;
+  return <RiveComponent className="auth-teddy auth-teddy-wave" aria-hidden="true" />;
 }
 
 function LoginTeddy({

@@ -1259,6 +1259,15 @@ html[dir="ltr"] .step::before {
   height: 100%;
 }
 
+/* login-teddy-wave.riv's artboard is a different aspect ratio (square)
+   than login-teddy.riv's (4:3) — with both using Fit.Cover in the same
+   box, that alone renders this character ~24% bigger than the other one.
+   Scaled down (measured against the actual 310x230 box, both in a neutral
+   resting pose) so the two read as the same size. */
+.auth-teddy-wave {
+  transform: scale(0.81);
+}
+
 .auth-field {
   display: grid;
   gap: 0.35rem;
