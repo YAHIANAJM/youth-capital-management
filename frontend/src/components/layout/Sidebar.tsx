@@ -131,10 +131,11 @@ export function Sidebar() {
                           const childLabel = tr.sidebar.nav[child.key];
                           const ChildIcon = child.Icon;
                           return (
-                            <div
+                            <Link
                               key={child.key}
+                              to="/template"
                               className={`sidebar-item sidebar-subitem${selectedStub === child.key ? " active" : ""}`}
-                              title={`${childLabel} — ${tr.sidebar.soon}`}
+                              title={childLabel}
                               aria-label={childLabel}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -143,7 +144,7 @@ export function Sidebar() {
                             >
                               <ChildIcon size={15} />
                               <span className="sidebar-item-label">{childLabel}</span>
-                            </div>
+                            </Link>
                           );
                         })}
                       </div>
@@ -164,16 +165,17 @@ export function Sidebar() {
                   <span className="sidebar-item-label">{label}</span>
                 </Link>
               ) : (
-                <div
+                <Link
                   key={key}
+                  to="/template"
                   className={`sidebar-item${selectedStub === key ? " active" : ""}`}
-                  title={`${label} — ${tr.sidebar.soon}`}
+                  title={label}
                   aria-label={label}
                   onClick={() => setSelectedStub(key)}
                 >
                   <Icon size={19} />
                   <span className="sidebar-item-label">{label}</span>
-                </div>
+                </Link>
               );
             })}
           </nav>
@@ -184,16 +186,17 @@ export function Sidebar() {
           {ACCOUNT_ITEMS.map(({ key, Icon }) => {
             const label = tr.sidebar.nav[key];
             return (
-              <div
+              <Link
                 key={key}
+                to="/template"
                 className={`sidebar-item${selectedStub === key ? " active" : ""}`}
-                title={`${label} — ${tr.sidebar.soon}`}
+                title={label}
                 aria-label={label}
                 onClick={() => setSelectedStub(key)}
               >
                 <Icon size={19} />
                 <span className="sidebar-item-label">{label}</span>
-              </div>
+              </Link>
             );
           })}
         </aside>
