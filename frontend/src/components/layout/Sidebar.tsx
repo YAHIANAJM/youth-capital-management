@@ -92,6 +92,7 @@ export function Sidebar() {
         }}
       >
         <aside className="sidebar">
+          <div className="sidebar-scroll">
           <Link to="/" className="sidebar-mark" title={tr.brand.name} aria-label={tr.brand.name}>
             {expanded ? (
               <img src={youthCapitalFull} alt={tr.brand.name} className="sidebar-mark-full" />
@@ -176,6 +177,7 @@ export function Sidebar() {
               );
             })}
           </nav>
+          </div>
         </aside>
 
         <aside className="sidebar-account">

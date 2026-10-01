@@ -1607,10 +1607,26 @@ html[dir="ltr"] .step::before {
 /* Icon-only at rest, always dark-on-white regardless of page theme, same
    idea as a fixed-color activity bar: the one deliberately anchored
    element on an otherwise light dashboard. The bigger of the two boxes —
-   flexes to fill whatever height .sidebar-account (fixed) doesn't use. */
+   flexes to fill whatever height .sidebar-account (fixed) doesn't use.
+   Purely a clipping shell now — overflow:hidden so .sidebar-scroll's own
+   scrollbar gets cut off at this box's rounded corners instead of poking
+   past them top and bottom (a plain overflow:auto + border-radius on the
+   same element doesn't clip its own scrollbar to the curve in any
+   browser — the actual scrolling moved to that inner div for this reason). */
 .sidebar {
   flex: 1;
   min-height: 0;
+  display: flex; /* makes .sidebar-scroll's flex:1 below resolve a real height to fill,
+    instead of its height:100% needing a definite height on this element that a
+    plain (non-flex) box sized via the parent's own flex:1 doesn't reliably have */
+  overflow: hidden;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1622,20 +1638,20 @@ html[dir="ltr"] .step::before {
   scrollbar-color: hsl(222 46% 15%) transparent; /* navy, same as .project-board etc. — solid, was 0.6 opacity and read as grey on the white sidebar */
 }
 
-.sidebar::-webkit-scrollbar {
+.sidebar-scroll::-webkit-scrollbar {
   width: 3px; /* as thin as a still-usable scrollbar gets */
 }
 
-.sidebar::-webkit-scrollbar-track {
+.sidebar-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
+.sidebar-scroll::-webkit-scrollbar-thumb {
   background: hsl(222 46% 15%);
   border-radius: 999px;
 }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: hsl(222 46% 30%);
 }
 
