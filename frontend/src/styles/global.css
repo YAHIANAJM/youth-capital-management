@@ -2932,6 +2932,7 @@ html[dir="ltr"] .step::before {
   width: 40px;
   height: 52px; /* a little taller than the previous 40.8px */
   background: #fff;
+  border: 1px solid hsl(222 46% 15%); /* same navy as .project-board — was borderless, blending invisibly into the white tab bar instead of reading as its own connector piece */
   z-index: 1;
   border-top-right-radius: 1.75rem; /* same radius pink uses */
   border-bottom-left-radius: 1.75rem;
