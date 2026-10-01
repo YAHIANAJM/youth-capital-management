@@ -293,3 +293,27 @@ export const CloseIcon = (p: P) => (
     <path d="M18 6 6 18M6 6l12 12" />
   </I>
 );
+
+/** A document/file — folded corner. */
+export const FileIcon = (p: P) => (
+  <I {...p}>
+    <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+    <path d="M14 3v5h5" opacity="0.6" />
+  </I>
+);
+
+/** Reports — a bar chart. */
+export const ChartBarIcon = (p: P) => (
+  <I {...p}>
+    <path d="M4 20V11M10 20V6M16 20v-9" />
+    <path d="M3 20h18" opacity="0.6" />
+  </I>
+);
+
+/** Events/schedule — a calendar. */
+export const CalendarIcon = (p: P) => (
+  <I {...p}>
+    <rect x="3.5" y="5" width="17" height="16" rx="2" />
+    <path d="M3.5 10h17M8 3v4M16 3v4" opacity="0.7" />
+  </I>
+);
