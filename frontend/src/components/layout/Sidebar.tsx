@@ -35,7 +35,7 @@ const ITEMS = [
     to: null,
     Icon: CoinsIcon,
     children: [
-      { key: "financeDashboard", Icon: GridIcon },
+      { key: "financeDashboard", Icon: GridIcon, to: "/finance/dashboard" },
       { key: "financeIncome", Icon: WalletIcon },
       { key: "financeExpenses", Icon: CoinsIcon },
       { key: "financeDocuments", Icon: FileIcon },
@@ -130,11 +130,13 @@ export function Sidebar() {
                         {children.map((child) => {
                           const childLabel = tr.sidebar.nav[child.key];
                           const ChildIcon = child.Icon;
+                          const childTo = "to" in child && child.to ? child.to : "/template";
+                          const isRealRoute = pathname === childTo && "to" in child && child.to;
                           return (
                             <Link
                               key={child.key}
-                              to="/template"
-                              className={`sidebar-item sidebar-subitem${selectedStub === child.key ? " active" : ""}`}
+                              to={childTo}
+                              className={`sidebar-item sidebar-subitem${isRealRoute || selectedStub === child.key ? " active" : ""}`}
                               title={childLabel}
                               aria-label={childLabel}
                               onClick={(e) => {

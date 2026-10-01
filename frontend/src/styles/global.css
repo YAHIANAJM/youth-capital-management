@@ -1868,6 +1868,13 @@ html[dir="ltr"] .step::before {
   background: #fff;
   border-radius: 26px; /* same corners as .sidebar */
   min-width: 0;
+  /* display:flex (not the PageTemplate preview's old plain block) so a real
+     page inside — like FinanceDashboard — can use flex:1/min-height:0 to
+     get a definite height for its own internal scroll, same pattern as
+     .platform-main/.sidebar above. Harmless for PageTemplate's empty div. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .platform-main {
@@ -4300,6 +4307,273 @@ html[dir="ltr"] .step::before {
   font-size: 0.62rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ═══ Finance ▸ Dashboard ═══ */
+
+.finance-dashboard {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 1.2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.finance-dashboard-header {
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.finance-dashboard-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.finance-dashboard-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0.2rem 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(0 0% 0% / 0.25) transparent;
+}
+
+.finance-dashboard-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.finance-dashboard-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.finance-dashboard-body::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 0% / 0.25);
+  border-radius: 999px;
+}
+
+.finance-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.finance-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.finance-tile-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.finance-tile-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.finance-tile-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.finance-tile-change {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-status-approved); /* gold — "good" semantic, same alias GlobalStats/ProjectBoard already use */
+}
+
+.finance-tile-change.negative {
+  color: var(--color-status-locked); /* rose-deep — "critical" semantic */
+}
+
+.finance-tile-sub {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.finance-chart-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.finance-chart-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.finance-chart-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.finance-chart-title {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.finance-chart-subtitle {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.finance-chart-svg {
+  width: 100%;
+  height: 220px;
+  display: block;
+  overflow: visible;
+}
+
+.finance-chart-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  background: hsl(222 46% 15%);
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.68rem;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 6px 18px hsl(0 0% 0% / 0.25);
+}
+
+.finance-chart-tooltip-title {
+  font-weight: 800;
+  margin-bottom: 0.1rem;
+}
+
+.finance-chart-tooltip-line {
+  color: hsl(0 0% 100% / 0.85);
+}
+
+.finance-donut-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.finance-donut-body {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.finance-donut-center-value {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 800;
+  fill: var(--color-text-primary);
+}
+
+.finance-donut-center-label {
+  font-size: 0.6rem;
+  fill: var(--color-text-muted);
+}
+
+.finance-donut-legend {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.finance-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.finance-donut-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.finance-donut-legend-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.finance-donut-legend-value {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.finance-donut-legend-pct {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  width: 2.2em;
+  text-align: right;
+}
+
+.finance-budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.finance-budget-row {
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.finance-budget-name {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* .project-capsule-bar/-progress-label/-value are reused here as-is for the
+   bar itself, but their colors were tuned for the dark purple detail panel
+   they were built for — override to read on this card's white background. */
+.finance-budget-row .project-capsule-bar {
+  background: hsl(222 20% 90%);
+}
+
+.finance-budget-row .project-capsule-progress-value {
   color: var(--color-text-muted);
 }
 

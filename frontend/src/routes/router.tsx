@@ -6,6 +6,7 @@ import { PlatformShell } from "../components/layout/PlatformShell";
 // import { Board } from "../pages/Board";
 // import { Home } from "../pages/Home"; — the cinematic scrubber intro, unmounted while the platform shell is being built
 // import { IdeaDetail } from "../pages/IdeaDetail";
+import { FinanceDashboard } from "../pages/FinanceDashboard";
 import { Login } from "../pages/Login";
 // import { NewIdea } from "../pages/NewIdea";
 import { Overview } from "../pages/Overview";
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
     // main rectangle) — remove once pages actually adopt it.
     path: "/template",
     element: <PageTemplate />,
+  },
+  {
+    path: "/finance/dashboard",
+    element: <FinanceDashboard />,
   },
   // Other routes (about, board, idea detail/new) are unwired for now —
   // their sidebar entries render as disabled "soon" items. Pages still
