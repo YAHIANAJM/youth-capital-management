@@ -5,14 +5,19 @@ import {
   BellIcon,
   BoardIcon,
   BuildingIcon,
+  CalendarIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
   ChevronDownIcon,
   CoinsIcon,
+  FileIcon,
   GridIcon,
   InboxIcon,
   LogOutIcon,
   PlusCircleIcon,
   SettingsIcon,
   UserIcon,
+  WalletIcon,
 } from "../icons";
 import youthCapitalMark from "../../assets/images/youth-capital-mark.svg";
 import youthCapitalFull from "../../assets/images/youth-capital-full.svg";
@@ -30,13 +35,23 @@ const ITEMS = [
     to: null,
     Icon: CoinsIcon,
     children: [
-      { key: "financeIncome" },
-      { key: "financeExpenses" },
-      { key: "financeDocuments" },
-      { key: "financeReports" },
+      { key: "financeDashboard", Icon: GridIcon },
+      { key: "financeIncome", Icon: WalletIcon },
+      { key: "financeExpenses", Icon: CoinsIcon },
+      { key: "financeDocuments", Icon: FileIcon },
+      { key: "financeReports", Icon: ChartBarIcon },
     ],
   },
-  { key: "board", to: null, Icon: BoardIcon },
+  {
+    key: "board",
+    to: null,
+    Icon: BoardIcon,
+    children: [
+      { key: "boardDashboard", Icon: GridIcon },
+      { key: "boardCreateProject", Icon: CalendarIcon },
+      { key: "boardApprovalPipeline", Icon: CheckCircleIcon },
+    ],
+  },
   { key: "newIdea", to: null, Icon: PlusCircleIcon },
   { key: "myRequests", to: null, Icon: InboxIcon },
   { key: "directory", to: null, Icon: BuildingIcon },
@@ -59,16 +74,22 @@ export function Sidebar() {
   // treatment as a real route match, shared across both boxes (one
   // selection at a time for the whole rail).
   const [selectedStub, setSelectedStub] = useState<string | null>(null);
-  // Only one nested group exists today (Finance) — a single flag is enough;
-  // this'd need to become a Set/key if a second grouped item shows up.
-  const [financeOpen, setFinanceOpen] = useState(false);
+  // Finance and Board are both grouped now — one open at a time, keyed by
+  // group, instead of the single boolean this used to be when only Finance
+  // had children. Finance defaults open (and mouse-leave returns to that
+  // default rather than closing everything) — with the tighter row gap the
+  // collapsed rail left empty space at the bottom; an open Finance fills it.
+  const [openGroup, setOpenGroup] = useState<string | null>("finance");
 
   return (
     <>
       <div
         className={`sidebar-col${expanded ? " expanded" : ""}`}
         onMouseEnter={() => setExpanded(true)}
-        onMouseLeave={() => setExpanded(false)}
+        onMouseLeave={() => {
+          setExpanded(false);
+          setOpenGroup("finance"); // back to the resting default — Board closes, Finance stays open
+        }}
       >
         <aside className="sidebar">
           <Link to="/" className="sidebar-mark" title={tr.brand.name} aria-label={tr.brand.name}>
@@ -86,26 +107,28 @@ export function Sidebar() {
               const children = "children" in item ? item.children : null;
 
               if (children) {
+                const isOpen = openGroup === key;
                 return (
                   <div key={key} className="sidebar-group">
                     <div
                       className={`sidebar-item${selectedStub === key ? " active" : ""}`}
                       title={`${label} — ${tr.sidebar.soon}`}
                       aria-label={label}
-                      aria-expanded={financeOpen}
+                      aria-expanded={isOpen}
                       onClick={() => {
                         setSelectedStub(key);
-                        setFinanceOpen((open) => !open);
+                        setOpenGroup((cur) => (cur === key ? null : key));
                       }}
                     >
                       <Icon size={19} />
                       <span className="sidebar-item-label">{label}</span>
-                      <ChevronDownIcon size={14} className={`sidebar-group-chevron${financeOpen ? " open" : ""}`} />
+                      <ChevronDownIcon size={14} className={`sidebar-group-chevron${isOpen ? " open" : ""}`} />
                     </div>
-                    {financeOpen && (
+                    {isOpen && (
                       <div className="sidebar-group-children">
                         {children.map((child) => {
                           const childLabel = tr.sidebar.nav[child.key];
+                          const ChildIcon = child.Icon;
                           return (
                             <div
                               key={child.key}
@@ -117,6 +140,7 @@ export function Sidebar() {
                                 setSelectedStub(child.key);
                               }}
                             >
+                              <ChildIcon size={15} />
                               <span className="sidebar-item-label">{childLabel}</span>
                             </div>
                           );

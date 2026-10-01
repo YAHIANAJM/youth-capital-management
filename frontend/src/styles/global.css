@@ -1618,6 +1618,25 @@ html[dir="ltr"] .step::before {
   padding: 1.1rem 0;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: thin; /* Firefox — thinnest built-in option */
+  scrollbar-color: hsl(222 46% 15%) transparent; /* navy, same as .project-board etc. — solid, was 0.6 opacity and read as grey on the white sidebar */
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 3px; /* as thin as a still-usable scrollbar gets */
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: hsl(222 46% 15%);
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: hsl(222 46% 30%);
 }
 
 /* The small box underneath — account/settings/logout. Fixed height (three
@@ -1667,7 +1686,9 @@ html[dir="ltr"] .step::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.1rem; /* was 2rem — with a dropdown open (5 extra rows) that much gap on every
+    row pushed total height past .sidebar's fixed rail, forcing a scrollbar on every
+    hover. Tighter gap keeps the rail contained instead of needing to scroll at all. */
   flex: 1;
   justify-content: center;
   width: 100%;
@@ -1746,18 +1767,47 @@ html[dir="ltr"] .step::before {
 }
 
 .sidebar-group-children {
+  position: relative; /* anchors the connector line below, so it spans this whole wrapper — one continuous line, not one broken segment per item with a gap between */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* was center — with sub-items now fit-content width, center floated each one to a different spot depending on its text length instead of lining them all up */
   gap: 0.2rem;
   width: 100%;
 }
 
+/* One continuous line down the left of the sub-items, same purple as the
+   active pill — spans the full wrapper height (top:0 to bottom:0), so it
+   isn't broken up by the gap between items the way a per-item border would be. */
+.sidebar-group-children::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.5rem;
+  width: 2px;
+  background: #6659ea;
+}
+
 .sidebar-subitem {
-  width: calc(100% - 1.2rem);
-  padding-inline-start: 2.4rem; /* indented under the parent's icon */
-  height: 34px;
+  width: fit-content; /* hover/active pill hugs the text, doesn't stretch full row width */
+  margin-inline-start: 1.5rem; /* moves the whole box (not just the text) past the connector line — the line now sits behind the box's left edge instead of poking out in front of it */
+  padding: 0.6rem; /* equal on all sides */
+  height: 30px; /* was 34px — shaving 4px off each of a dropdown's 5 rows adds up */
   font-size: 0.78rem;
+}
+
+/* .sidebar-col.expanded .sidebar-item (higher specificity, 3 classes) resets
+   padding on all sides for the expanded/hover state — the only state a
+   sub-item is ever visible in — silently overriding the padding-inline-start
+   above. Matching (and beating) that specificity here instead of guessing
+   at source order. */
+.sidebar-col.expanded .sidebar-group-children .sidebar-item.sidebar-subitem {
+  /* was stretching to calc(100% - 1.6rem) via .sidebar-col.expanded .sidebar-item — the
+     hover/active pill then spanned the whole row instead of hugging the text.
+     width:fit-content + matching padding on both sides fixes that. */
+  width: fit-content;
+  margin-inline-start: 1.5rem;
+  padding: 0.6rem;
 }
 
 /* Full-page blur while the rail is expanded — everything except the rail
